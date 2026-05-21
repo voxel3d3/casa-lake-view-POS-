@@ -45,24 +45,26 @@
         .resort-header {
             background-color: var(--primary-color);
             color: white;
-            padding: 15px;
+            padding: 12px;
             text-align: center;
-            font-size: 24px;
+            font-size: 22px;
             font-weight: bold;
             letter-spacing: 1px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            flex-shrink: 0;
         }
 
         .search-container {
             padding: 10px 15px;
             background-color: #fff;
             border-bottom: 1px solid #e2e8f0;
+            flex-shrink: 0;
         }
 
         .search-input {
             width: 100%;
-            padding: 12px 15px;
-            font-size: 16px;
+            padding: 10px 15px;
+            font-size: 15px;
             border: 2px solid #cbd5e1;
             border-radius: 8px;
             outline: none;
@@ -76,12 +78,13 @@
         .tab-bar {
             display: flex;
             background: #d1d5db;
+            flex-shrink: 0;
         }
 
         .tab-btn {
             flex: 1;
-            padding: 18px;
-            font-size: 18px;
+            padding: 14px;
+            font-size: 16px;
             font-weight: bold;
             border: none;
             background: none;
@@ -99,14 +102,15 @@
             display: flex;
             flex-wrap: wrap;
             background: #f1f5f9;
-            padding: 8px;
+            padding: 6px;
             gap: 6px;
             border-bottom: 1px solid #e2e8f0;
+            flex-shrink: 0;
         }
 
         .sub-tab-btn {
-            padding: 8px 14px;
-            font-size: 13px;
+            padding: 6px 12px;
+            font-size: 12px;
             font-weight: 600;
             border: 1px solid #cbd5e1;
             border-radius: 20px;
@@ -125,14 +129,15 @@
             flex: 1;
             overflow-y: auto;
             position: relative;
+            background-color: #f8fafc;
         }
 
         .grid-container {
-            padding: 20px;
+            padding: 15px;
             display: none;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            grid-auto-rows: minmax(110px, auto);
-            gap: 12px;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            grid-auto-rows: minmax(100px, auto);
+            gap: 10px;
         }
 
         .grid-container.active {
@@ -140,11 +145,11 @@
         }
 
         #search-results-view {
-            padding: 20px;
+            padding: 15px;
             display: none;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            grid-auto-rows: minmax(110px, auto);
-            gap: 12px;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            grid-auto-rows: minmax(100px, auto);
+            gap: 10px;
         }
 
         .item-card {
@@ -157,7 +162,7 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 12px;
+            padding: 10px;
             cursor: pointer;
             transition: transform 0.1s, background-color 0.1s;
         }
@@ -170,8 +175,8 @@
 
         .item-name {
             font-weight: 600;
-            font-size: 14px;
-            margin-bottom: 6px;
+            font-size: 13px;
+            margin-bottom: 4px;
             color: #1e293b;
             line-height: 1.3;
         }
@@ -179,17 +184,18 @@
         .item-price {
             color: var(--accent-color);
             font-weight: bold;
-            font-size: 14px;
+            font-size: 13px;
         }
 
-        /* RIGHT SIDE: RECEIPT AND TABLES CONTAINER */
+        /* RIGHT SIDE: RECEIPT AND TABLES CONTAINER - FIXED TERMINAL HEIGHT OVERFLOW */
         .order-container {
             width: 35%;
             display: flex;
             flex-direction: column;
             background: white;
-            height: 100vh;
-            max-height: 100vh;
+            height: 100%; /* Changed from 100vh to conform to hard container borders */
+            max-height: 100%;
+            overflow: hidden;
         }
 
         .table-selector-bar {
@@ -199,7 +205,7 @@
             padding: 8px;
             gap: 6px;
             border-bottom: 2px solid #cbd5e1;
-            flex-shrink: 0;
+            flex-shrink: 0; /* Never allow tables to warp core boundaries */
             align-items: center;
         }
 
@@ -212,15 +218,15 @@
         }
 
         .table-btn {
-            padding: 10px 14px;
-            font-size: 14px;
+            padding: 8px 12px;
+            font-size: 13px;
             font-weight: bold;
             border: 1px solid #cbd5e1;
             border-radius: 6px;
             background: #f1f5f9;
             color: #475569;
             cursor: pointer;
-            min-width: 55px;
+            min-width: 50px;
             text-align: center;
             transition: all 0.15s ease;
             flex-shrink: 0;
@@ -241,42 +247,43 @@
             background-color: var(--accent-color);
             color: white;
             border-color: var(--accent-color);
-            font-size: 16px;
-            min-width: 45px;
-            padding: 8px 10px;
+            font-size: 15px;
+            min-width: 40px;
+            padding: 6px 10px;
         }
         .add-table-btn:active {
             background-color: var(--primary-color);
         }
 
         .order-header {
-            padding: 15px 20px;
-            font-size: 18px;
+            padding: 12px 15px;
+            font-size: 16px;
             font-weight: bold;
             border-bottom: 2px solid #eee;
             background: #fdfdfd;
-            flex-shrink: 0;
+            flex-shrink: 0; /* Lock header position */
             display: flex;
             justify-content: space-between;
             align-items: center;
             color: var(--primary-color);
         }
 
+        /* DYNAMIC RECEIPT WRAPPER: ELONGATES OR SHRINKS TO SECURE THE PRINT ACTIONS AT BOTTOM */
         .receipt-items {
-            flex: 1;
-            overflow-y: auto;
-            padding: 15px;
-            min-height: 0;
+            flex: 1 1 auto; /* Grow and shrink dynamically based on content volume */
+            overflow-y: auto; /* Internal scroll ONLY if row count exceeds window scale */
+            padding: 12px;
+            background: #fff;
         }
 
         .receipt-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
-            padding-bottom: 12px;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
             border-bottom: 1px dashed #eee;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .receipt-item-details {
@@ -291,13 +298,13 @@
         }
 
         .qty-btn {
-            width: 28px;
-            height: 28px;
+            width: 26px;
+            height: 26px;
             border-radius: 50%;
             border: 1px solid #bbb;
             background: #fff;
             font-weight: bold;
-            font-size: 16px;
+            font-size: 14px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -313,34 +320,34 @@
             color: var(--dark-text);
         }
 
+        /* CHECKOUT FOOTER SECTION: LOCKED SECURELY ON ALL TERMINALS */
         .checkout-section {
-            padding: 20px;
-            background: #f9f9f9;
-            border-top: 2px solid #eee;
-            flex-shrink: 0;
-            margin-top: auto;
+            padding: 15px;
+            background: #f1f5f9;
+            border-top: 2px solid #cbd5e1;
+            flex-shrink: 0; /* STRICTLY FORBID THE SYSTEM FROM CUTTING THIS VIEW OFF */
+            margin-top: auto; /* Always force directly down to the floor */
         }
 
         .total-row {
             display: flex;
             justify-content: space-between;
-            font-size: 22px;
+            font-size: 18px;
             font-weight: bold;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             color: var(--primary-color);
         }
 
-        /* NEW CUSTOM LAYOUT FOR SPLIT OPERATION BUTTONS */
         .action-btns {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
         .btn {
             width: 100%;
-            padding: 14px;
-            font-size: 15px;
+            padding: 12px;
+            font-size: 14px;
             font-weight: bold;
             border: none;
             border-radius: 6px;
@@ -364,7 +371,7 @@
         }
         .btn-payment:active { background-color: #27ae60; }
 
-        /* ================= KOT & BILL THERMAL PRINT FORMATTING ================= */
+        /* Thermal Xprinter rules */
         #thermal-invoice-printout {
             display: none;
         }
@@ -906,7 +913,7 @@
 
         <div class="order-header">
             <span>Current Order</span>
-            <span id="active-table-title" style="background: var(--accent-color); color: white; padding: 4px 10px; border-radius: 4px; font-size: 14px;">TABLE T1</span>
+            <span id="active-table-title" style="background: var(--accent-color); color: white; padding: 4px 10px; border-radius: 4px; font-size: 13px;">TABLE T1</span>
         </div>
         
         <div class="receipt-items" id="receipt-items-container">
@@ -1082,7 +1089,6 @@
             const activeOrderArray = tableOrders[currentTable];
             const existingItem = activeOrderArray.find(item => item.name === name);
             
-            // Map item additions to categories automatically
             let catType = 'food';
             const mappedItem = allItemsList.find(i => i.name === name);
             if(mappedItem) catType = mappedItem.category;
@@ -1136,7 +1142,7 @@
                 row.className = 'receipt-row';
                 row.innerHTML = `
                     <div class="receipt-item-details">
-                        <div><strong>${item.name}</strong> <span style="font-size:11px; color:#777;">(${item.category})</span></div>
+                        <div><strong>${item.name}</strong></div>
                         <div class="qty-controls">
                             <button class="qty-btn" onclick="changeQty('${item.name}', -1)">-</button>
                             <span>${item.qty}</span>
@@ -1151,7 +1157,6 @@
             document.getElementById('grand-total').innerText = `GHS ${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
         }
 
-        // NEW: KITCHEN KOT PRINT FILTERED SYSTEM
         function printKitchenOrder() {
             const activeOrderArray = tableOrders[currentTable];
             const foodItems = activeOrderArray.filter(item => item.category === 'food');
@@ -1182,12 +1187,10 @@
                 <div class="print-center" style="font-size: 11px;">Casa Lake View - Kitchen Copy</div>
             `;
 
-            // Inject template structure to hidden thermal layer and run print loop
             document.getElementById('thermal-invoice-printout').innerHTML = template;
             window.print();
         }
 
-        // NEW: TOTAL ORDER BILL GUEST PRINTER WITH AUTO-RESET MANAGEMENT
         function printPaymentBill() {
             const activeOrderArray = tableOrders[currentTable];
 
@@ -1209,7 +1212,7 @@
                     <span>Date: ${dateStr}</span>
                 </div>
                 <div class="print-space-between" style="font-size: 12px;">
-                    <span>Staff: POS-Front</span>
+                    <span>Staff: Front Desk</span>
                     <span>Time: ${timeStr}</span>
                 </div>
                 <div class="print-divider"></div>
@@ -1243,7 +1246,6 @@
             document.getElementById('thermal-invoice-printout').innerHTML = template;
             window.print();
 
-            // Settle out tab data memory blocks completely and return flags back to grey status bars
             tableOrders[currentTable] = [];
             updateReceiptDisplay();
             updateTableIndicators();
