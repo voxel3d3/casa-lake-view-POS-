@@ -12,6 +12,7 @@
             --dark-text: #333;
             --success-green: #2ecc71;
             --danger-red: #e74c3c;
+            --sub-tab-color: #e2e8f0;
         }
 
         * {
@@ -19,7 +20,7 @@
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            user-select: none; /* Prevents text highlighting on touchscreen */
+            user-select: none;
         }
 
         body {
@@ -50,14 +51,35 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
+        /* NEW: SEARCH BAR SECTION */
+        .search-container {
+            padding: 10px 15px;
+            background-color: #fff;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 16px;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-color);
+        }
+
         .tab-bar {
             display: flex;
-            background: #e0e0e0;
+            background: #d1d5db;
         }
 
         .tab-btn {
             flex: 1;
-            padding: 20px;
+            padding: 18px;
             font-size: 18px;
             font-weight: bold;
             border: none;
@@ -72,51 +94,93 @@
             border-bottom: 4px solid var(--accent-color);
         }
 
-        .grid-container {
+        /* SUB-CATEGORY NAVIGATION (FOR FOODS) */
+        .sub-tab-bar {
+            display: flex;
+            flex-wrap: wrap;
+            background: #f1f5f9;
+            padding: 8px;
+            gap: 6px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .sub-tab-btn {
+            padding: 8px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            border: 1px solid #cbd5e1;
+            border-radius: 20px;
+            background: white;
+            cursor: pointer;
+            color: #475569;
+        }
+
+        .sub-tab-btn.active {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .menu-content-wrapper {
             flex: 1;
-            padding: 20px;
             overflow-y: auto;
+            position: relative;
+        }
+
+        .grid-container {
+            padding: 20px;
             display: none;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            grid-auto-rows: minmax(120px, auto);
-            gap: 15px;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            grid-auto-rows: minmax(110px, auto);
+            gap: 12px;
         }
 
         .grid-container.active {
             display: grid;
         }
 
+        /* NEW: SEARCH RESULTS CONTAINER */
+        #search-results-view {
+            padding: 20px;
+            display: none;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            grid-auto-rows: minmax(110px, auto);
+            gap: 12px;
+        }
+
         .item-card {
             background: white;
             border-radius: 8px;
-            border: 1px solid #ccc;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 10px;
+            padding: 12px;
             cursor: pointer;
             transition: transform 0.1s, background-color 0.1s;
         }
 
         .item-card:active {
-            transform: scale(0.95);
-            background-color: #e8f0fe;
+            transform: scale(0.96);
+            background-color: #f0fdf4;
+            border-color: var(--success-green);
         }
 
         .item-name {
             font-weight: 600;
-            font-size: 16px;
-            margin-bottom: 8px;
-            color: #222;
+            font-size: 14px;
+            margin-bottom: 6px;
+            color: #1e293b;
+            line-height: 1.3;
         }
 
         .item-price {
             color: var(--accent-color);
             font-weight: bold;
-            font-size: 15px;
+            font-size: 14px;
         }
 
         /* RIGHT SIDE: ORDER / RECEIPT SECTION */
@@ -149,7 +213,7 @@
             margin-bottom: 12px;
             padding-bottom: 12px;
             border-bottom: 1px dashed #eee;
-            font-size: 15px;
+            font-size: 14px;
         }
 
         .receipt-item-details {
@@ -233,76 +297,274 @@
 </head>
 <body>
 
-    <!-- LEFT SIDE: MENU -->
     <div class="menu-container">
         <div class="resort-header">CASA LAKE VIEW RESORT</div>
         
-        <div class="tab-bar">
-            <button class="tab-btn active" onclick="switchTab('food-menu')">FOODS</button>
-            <button class="tab-btn" onclick="switchTab('drinks-menu')">DRINKS</button>
+        <div class="search-container">
+            <input type="text" id="menu-search" class="search-input" placeholder="Type here to search food or drinks instantly..." oninput="searchMenu()">
+        </div>
+        
+        <div class="tab-bar" id="main-tabs-nav">
+            <button id="main-food-btn" class="tab-btn active" onclick="switchMainTab('foods')">FOODS</button>
+            <button id="main-drinks-btn" class="tab-btn" onclick="switchMainTab('drinks')">DRINKS</button>
         </div>
 
-        <!-- Food Grid -->
-        <div id="food-menu" class="grid-container active">
-            <div class="item-card" onclick="addToOrder('Grilled Tilapia', 80)">
-                <span class="item-name">Grilled Tilapia</span>
-                <span class="item-price">GH₵ 80.00</span>
-            </div>
-            <div class="item-card" onclick="addToOrder('Jollof Rice with Chicken', 65)">
-                <span class="item-name">Jollof Rice + Chicken</span>
-                <span class="item-price">GH₵ 65.00</span>
-            </div>
-            <div class="item-card" onclick="addToOrder('Banku with Okro Soup', 55)">
-                <span class="item-name">Banku + Okro Soup</span>
-                <span class="item-price">GH₵ 55.00</span>
-            </div>
-            <div class="item-card" onclick="addToOrder('Fried Rice with Fish', 60)">
-                <span class="item-name">Fried Rice + Fish</span>
-                <span class="item-price">GH₵ 60.00</span>
-            </div>
-            <div class="item-card" onclick="addToOrder('French Fries & Wings', 70)">
-                <span class="item-name">Fries & Wings</span>
-                <span class="item-price">GH₵ 70.00</span>
-            </div>
+        <div id="food-sub-tabs" class="sub-tab-bar">
+            <button class="sub-tab-btn active" onclick="switchFoodSubTab('breakfast')">Breakfast</button>
+            <button class="sub-tab-btn" onclick="switchFoodSubTab('starters')">Starters</button>
+            <button class="sub-tab-btn" onclick="switchFoodSubTab('main-dish')">Main Dish</button>
+            <button class="sub-tab-btn" onclick="switchFoodSubTab('local-dish')">Local Dish</button>
+            <button class="sub-tab-btn" onclick="switchFoodSubTab('side-dish')">Side Dishes</button>
+            <button class="sub-tab-btn" onclick="switchFoodSubTab('sandwiches')">Sandwiches/Wraps</button>
+            <button class="sub-tab-btn" onclick="switchFoodSubTab('pizza')">Pizza</button>
+            <button class="sub-tab-btn" onclick="switchFoodSubTab('special-foods')">Special Foods</button>
+            <button class="sub-tab-btn" onclick="switchFoodSubTab('combos')">Combos Menu</button>
         </div>
 
-        <!-- Drinks Grid -->
-        <div id="drinks-menu" class="grid-container">
-            <div class="item-card" onclick="addToOrder('Club Beer (Large)', 25)">
-                <span class="item-name">Club Beer (L)</span>
-                <span class="item-price">GH₵ 25.00</span>
+        <div class="menu-content-wrapper">
+            
+            <div id="search-results-view"></div>
+
+            <div id="breakfast" class="grid-container food-grid active">
+                <div class="item-card" onclick="addToOrder('Full English Breakfast', 170)">
+                    <span class="item-name">Full English Breakfast</span>
+                    <span class="item-price">GHS 170</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Pancakes with Fresh Fruit', 150)">
+                    <span class="item-name">Pancakes + Fruit & Honey</span>
+                    <span class="item-price">GHS 150</span>
+                </div>
             </div>
-            <div class="item-card" onclick="addToOrder('Coca Cola (Can)', 15)">
-                <span class="item-name">Coca Cola Can</span>
-                <span class="item-price">GH₵ 15.00</span>
+
+            <div id="starters" class="grid-container food-grid">
+                <div class="item-card" onclick="addToOrder('Crispy Calamari with Orange-Honey Mayo', 120)">
+                    <span class="item-name">Crispy Calamari</span>
+                    <span class="item-price">GHS 120</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Crispy Chicken Tenders', 100)">
+                    <span class="item-name">Chicken Tenders</span>
+                    <span class="item-price">GHS 100</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Spicy Kelewele', 50)">
+                    <span class="item-name">Spicy Kelewele</span>
+                    <span class="item-price">GHS 50</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Crispy Fish Fingers', 100)">
+                    <span class="item-name">Crispy Fish Fingers</span>
+                    <span class="item-price">GHS 100</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Green Garden Salad', 60)">
+                    <span class="item-name">Green Garden Salad</span>
+                    <span class="item-price">GHS 60</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Ghana-Man Salad', 100)">
+                    <span class="item-name">Ghana-Man Salad</span>
+                    <span class="item-price">GHS 100</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Cucumber Bowl Tuna Salad', 80)">
+                    <span class="item-name">Cucumber Tuna Salad</span>
+                    <span class="item-price">GHS 80</span>
+                </div>
             </div>
-            <div class="item-card" onclick="addToOrder('Bottled Water', 10)">
-                <span class="item-name">Bottled Water</span>
-                <span class="item-price">GH₵ 10.00</span>
+
+            <div id="main-dish" class="grid-container food-grid">
+                <div class="item-card" onclick="addToOrder('Chicken Skewer', 150)">
+                    <span class="item-name">Chicken Skewer</span>
+                    <span class="item-price">GHS 150</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Spicy Goat Chops', 150)">
+                    <span class="item-name">Spicy Goat Chops</span>
+                    <span class="item-price">GHS 150</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Fried Red Snappers', 150)">
+                    <span class="item-name">Fried Red Snappers</span>
+                    <span class="item-price">GHS 150</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Spicy Chicken Chops', 100)">
+                    <span class="item-name">Spicy Chicken Chops</span>
+                    <span class="item-price">GHS 100</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Grilled Chicken Thighs', 100)">
+                    <span class="item-name">Grilled Chicken Thighs</span>
+                    <span class="item-price">GHS 100</span>
+                </div>
             </div>
-            <div class="item-card" onclick="addToOrder('Sobolo (House Blend)', 15)">
-                <span class="item-name">House Sobolo</span>
-                <span class="item-price">GH₵ 15.00</span>
+
+            <div id="local-dish" class="grid-container food-grid">
+                <div class="item-card" onclick="addToOrder('Banku and Tilapia', 200)">
+                    <span class="item-name">Banku & Tilapia</span>
+                    <span class="item-price">GHS 200</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Acheke and Tilapia', 200)">
+                    <span class="item-name">Acheke & Tilapia</span>
+                    <span class="item-price">GHS 200</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Boiled Yam with Egg Stew & Fish', 150)">
+                    <span class="item-name">Boiled Yam, Stew & Fish</span>
+                    <span class="item-price">GHS 150</span>
+                </div>
             </div>
-            <div class="item-card" onclick="addToOrder('Fresh Coconut Water', 15)">
-                <span class="item-name">Fresh Coconut</span>
-                <span class="item-price">GH₵ 15.00</span>
+
+            <div id="side-dish" class="grid-container food-grid">
+                <div class="item-card" onclick="addToOrder('Spicy Chicken Wings (8pcs)', 95)">
+                    <span class="item-name">Spicy Wings (8pcs)</span>
+                    <span class="item-price">GHS 95</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Spicy Chicken Wings (12pcs)', 150)">
+                    <span class="item-name">Spicy Wings (12pcs)</span>
+                    <span class="item-price">GHS 150</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Spicy Chicken Wings (16pcs)', 200)">
+                    <span class="item-name">Spicy Wings (16pcs)</span>
+                    <span class="item-price">GHS 200</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Yam Chips', 50)">
+                    <span class="item-name">Yam Chips</span>
+                    <span class="item-price">GHS 50</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Potato Chips', 50)">
+                    <span class="item-name">Potato Chips</span>
+                    <span class="item-price">GHS 50</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Egg Fried Rice', 50)">
+                    <span class="item-name">Egg Fried Rice</span>
+                    <span class="item-price">GHS 50</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Ghana Jollof', 50)">
+                    <span class="item-name">Ghana Jollof</span>
+                    <span class="item-price">GHS 50</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Plain Rice', 50)">
+                    <span class="item-name">Plain Rice</span>
+                    <span class="item-price">GHS 50</span>
+                </div>
             </div>
+
+            <div id="sandwiches" class="grid-container food-grid">
+                <div class="item-card" onclick="addToOrder('Club Sandwich with Fries', 100)">
+                    <span class="item-name">Club Sandwich + Fries</span>
+                    <span class="item-price">GHS 100</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Chicken Wrap with Fries', 105)">
+                    <span class="item-name">Chicken Wrap + Fries</span>
+                    <span class="item-price">GHS 105</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Beef Burger with Fries', 150)">
+                    <span class="item-name">Beef Burger + Fries</span>
+                    <span class="item-price">GHS 150</span>
+                </div>
+            </div>
+
+            <div id="pizza" class="grid-container food-grid">
+                <div class="item-card" onclick="addToOrder('All Season Pizza (L)', 200)">
+                    <span class="item-name">All Season (L)</span>
+                    <span class="item-price">GHS 200</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Beef Pizza (L)', 180)">
+                    <span class="item-name">Beef Pizza (L)</span>
+                    <span class="item-price">GHS 180</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Chicken Pizza (L)', 180)">
+                    <span class="item-name">Chicken Pizza (L)</span>
+                    <span class="item-price">GHS 180</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Margherita Pizza (L)', 150)">
+                    <span class="item-name">Margherita (L)</span>
+                    <span class="item-price">GHS 150</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Sea Food Pizza (L)', 255)">
+                    <span class="item-name">Sea Food Pizza (L)</span>
+                    <span class="item-price">GHS 250</span>
+                </div>
+            </div>
+
+            <div id="special-foods" class="grid-container food-grid">
+                <div class="item-card" onclick="addToOrder('Seafood Fried Rice / Jollof', 200)">
+                    <span class="item-name">Seafood Fried Rice/Jollof</span>
+                    <span class="item-price">GHS 200</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Assorted Fried Rice / Jollof', 150)">
+                    <span class="item-name">Assorted Fried Rice/Jollof</span>
+                    <span class="item-price">GHS 150</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Assorted Noodle', 120)">
+                    <span class="item-name">Assorted Noodle</span>
+                    <span class="item-price">GHS 120</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Seafood Noodle', 150)">
+                    <span class="item-name">Seafood Noodle</span>
+                    <span class="item-price">GHS 150</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Loaded Fries', 150)">
+                    <span class="item-name">Loaded Fries</span>
+                    <span class="item-price">GHS 150</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Loaded Angwamo', 250)">
+                    <span class="item-name">Loaded Angwamo</span>
+                    <span class="item-price">GHS 250</span>
+                </div>
+            </div>
+
+            <div id="combos" class="grid-container food-grid">
+                <div class="item-card" onclick="addToOrder('Combo: Rice + 6 Wings', 120)">
+                    <span class="item-name">Rice + 6 Wings Combo</span>
+                    <span class="item-price">GHS 120</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Combo: Rice + 4 Wings', 100)">
+                    <span class="item-name">Rice + 4 Wings Combo</span>
+                    <span class="item-price">GHS 100</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Combo: Rice + Chicken Thigh', 100)">
+                    <span class="item-name">Rice + Thigh Combo</span>
+                    <span class="item-price">GHS 100</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Combo: Rice + Fish', 100)">
+                    <span class="item-name">Rice + Fish Combo</span>
+                    <span class="item-price">GHS 100</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Combo: Chips + Fish/Chicken', 100)">
+                    <span class="item-name">Chips + Fish/Chicken</span>
+                    <span class="item-price">GHS 100</span>
+                </div>
+            </div>
+
+
+            <div id="drinks-menu" class="grid-container">
+                <div class="item-card" onclick="addToOrder('Club Beer (Large)', 25)">
+                    <span class="item-name">Club Beer (L)</span>
+                    <span class="item-price">GHS 25</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Coca Cola (Can)', 15)">
+                    <span class="item-name">Coca Cola Can</span>
+                    <span class="item-price">GHS 15</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Bottled Water', 10)">
+                    <span class="item-name">Bottled Water</span>
+                    <span class="item-price">GHS 10</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Sobolo (House Blend)', 15)">
+                    <span class="item-name">House Sobolo</span>
+                    <span class="item-price">GHS 15</span>
+                </div>
+                <div class="item-card" onclick="addToOrder('Fresh Coconut Water', 15)">
+                    <span class="item-name">Fresh Coconut</span>
+                    <span class="item-price">GHS 15</span>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <!-- RIGHT SIDE: RECEIPT -->
     <div class="order-container">
         <div class="order-header">Current Order</div>
         
         <div class="receipt-items" id="receipt-items-container">
-            <!-- Dynamic order items inject here -->
-        </div>
+            </div>
 
         <div class="checkout-section">
             <div class="total-row">
                 <span>Total:</span>
-                <span id="grand-total">GH₵ 0.00</span>
+                <span id="grand-total">GHS 0.00</span>
             </div>
             <div class="action-btns">
                 <button class="btn btn-clear" onclick="clearOrder()">Clear</button>
@@ -313,18 +575,88 @@
 
     <script>
         let currentOrder = [];
+        let currentMainMode = 'foods';
+        let currentFoodSubTab = 'breakfast';
 
-        function switchTab(tabId) {
-            document.querySelectorAll('.grid-container').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        // Master array built straight from the layout to manage quick searching
+        const allItemsList = [];
+        document.querySelectorAll('.item-card').forEach(card => {
+            const onclickStr = card.getAttribute('onclick');
+            // Extract item specifications from onclick strings dynamically
+            const matches = onclickStr.match(/'([^']+)',\s*([0-9.]+)/);
+            if(matches) {
+                allItemsList.push({
+                    name: matches[1],
+                    price: parseFloat(matches[2]),
+                    elementHtml: card.outerHTML
+                });
+            }
+        });
+
+        // Search functional logic
+        function searchMenu() {
+            const query = document.getElementById('menu-search').value.toLowerCase().trim();
+            const resultsView = document.getElementById('search-results-view');
+            const navTabs = document.getElementById('main-tabs-nav');
+            const subTabs = document.getElementById('food-sub-tabs');
             
-            document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
+            if (query.length > 0) {
+                // Hide typical categories completely
+                document.querySelectorAll('.grid-container').forEach(el => el.classList.remove('active'));
+                navTabs.style.display = 'none';
+                subTabs.style.display = 'none';
+                
+                // Track matches
+                let matchHtml = "";
+                allItemsList.forEach(item => {
+                    if(item.name.toLowerCase().includes(query)) {
+                        matchHtml += item.elementHtml;
+                    }
+                });
+                
+                resultsView.innerHTML = matchHtml || '<div style="padding: 20px; color: #64748b; font-weight: 500;">No items found...</div>';
+                resultsView.style.display = 'grid';
+            } else {
+                // Restore tabs layout instantly if search is empty
+                resultsView.style.display = 'none';
+                navTabs.style.display = 'flex';
+                switchMainTab(currentMainMode);
+            }
+        }
+
+        function switchMainTab(mode) {
+            currentMainMode = mode;
+            document.querySelectorAll('.grid-container').forEach(el => el.classList.remove('active'));
+            document.getElementById('main-food-btn').classList.remove('active');
+            document.getElementById('main-drinks-btn').classList.remove('active');
+
+            if(mode === 'foods') {
+                document.getElementById('main-food-btn').classList.add('active');
+                document.getElementById('food-sub-tabs').style.display = 'flex';
+                document.getElementById(currentFoodSubTab).classList.add('active');
+            } else {
+                document.getElementById('main-drinks-btn').classList.add('active');
+                document.getElementById('food-sub-tabs').style.display = 'none';
+                document.getElementById('drinks-menu').classList.add('active');
+            }
+        }
+
+        function switchFoodSubTab(subTabId) {
+            currentFoodSubTab = subTabId;
+            document.querySelectorAll('.food-grid').forEach(el => el.classList.remove('active'));
+            
+            // Manage standard click targeting active states safely
+            const eventTarget = event ? event.currentTarget : null;
+            if (eventTarget) {
+                document.querySelectorAll('.sub-tab-btn').forEach(el => el.classList.remove('active'));
+                eventTarget.classList.add('active');
+            }
+            
+            document.getElementById(subTabId).classList.add('active');
         }
 
         function addToOrder(name, price) {
             const existingItem = currentOrder.find(item => item.name === name);
-
             if (existingItem) {
                 existingItem.qty += 1;
             } else {
@@ -332,6 +664,18 @@
             }
             updateReceiptDisplay();
         }
+
+        // Direct item event delegation fallback for search items injection clones
+        document.querySelector('.menu-content-wrapper').addEventListener('click', function(e) {
+            const card = e.target.closest('.item-card');
+            if (card && document.getElementById('search-results-view').style.display === 'grid') {
+                const onclickStr = card.getAttribute('onclick');
+                const matches = onclickStr.match(/'([^']+)',\s*([0-9.]+)/);
+                if(matches) {
+                    addToOrder(matches[1], parseFloat(matches[2]));
+                }
+            }
+        });
 
         function changeQty(name, amount) {
             const item = currentOrder.find(item => item.name === name);
@@ -357,19 +701,19 @@
                 row.className = 'receipt-row';
                 row.innerHTML = `
                     <div class="receipt-item-details">
-                        <div><strong>\${item.name}</strong></div>
+                        <div><strong>${item.name}</strong></div>
                         <div class="qty-controls">
-                            <button class="qty-btn" onclick="changeQty('\${item.name}', -1)">-</button>
-                            <span>\${item.qty}</span>
-                            <button class="qty-btn" onclick="changeQty('\${item.name}', 1)">+</button>
+                            <button class="qty-btn" onclick="changeQty('${item.name}', -1)">-</button>
+                            <span>${item.qty}</span>
+                            <button class="qty-btn" onclick="changeQty('${item.name}', 1)">+</button>
                         </div>
                     </div>
-                    <div class="receipt-item-price">GH₵ \${itemTotal.toFixed(2)}</div>
+                    <div class="receipt-item-price">GHS ${itemTotal.toFixed(2)}</div>
                 `;
                 container.appendChild(row);
             });
 
-            document.getElementById('grand-total').innerText = `GH₵ \${total.toFixed(2)}`;
+            document.getElementById('grand-total').innerText = `GHS ${total.toFixed(2)}`;
         }
 
         function clearOrder() {
