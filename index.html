@@ -1292,7 +1292,37 @@
 
             document.getElementById('grand-total').innerText = `GHS ${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
         }
-    </script>
+    // --- PRINT PREVIEW LOGIC ---
+let pendingPrintType = '';
+
+function openPreview(type) {
+    const modal = document.getElementById('print-modal');
+    const preview = document.getElementById('preview-content');
+    pendingPrintType = type;
+    
+    // Create preview text
+    let previewText = `Table: ${currentTable}\nItems:\n`;
+    tableOrders[currentTable].forEach(i => {
+        previewText += `${i.qty}x ${i.name} (GHS ${i.price * i.qty})\n`;
+    });
+    preview.innerText = previewText;
+    
+    modal.style.display = 'flex';
+}
+
+function closeModal() {
+    document.getElementById('print-modal').style.display = 'none';
+}
+
+document.getElementById('confirm-print-btn').onclick = function() {
+    const waiter = document.getElementById('waiter-name').value || "Front Desk";
+    closeModal();
+    if (pendingPrintType === 'kitchen') {
+        printKitchenOrder(waiter);
+    } else {
+        printPaymentBill(waiter);
+    }
+};</script>
 <div id="print-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
     <div style="background:white; padding:25px; border-radius:10px; width:300px; text-align:center;">
         <h3 id="modal-title">Enter Waiter Name</h3>
