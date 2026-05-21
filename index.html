@@ -187,13 +187,13 @@
             font-size: 13px;
         }
 
-        /* RIGHT SIDE: RECEIPT AND TABLES CONTAINER - FIXED TERMINAL HEIGHT OVERFLOW */
+        /* RIGHT SIDE: RECEIPT AND TABLES CONTAINER */
         .order-container {
             width: 35%;
             display: flex;
             flex-direction: column;
             background: white;
-            height: 100%; /* Changed from 100vh to conform to hard container borders */
+            height: 100%;
             max-height: 100%;
             overflow: hidden;
         }
@@ -205,7 +205,7 @@
             padding: 8px;
             gap: 6px;
             border-bottom: 2px solid #cbd5e1;
-            flex-shrink: 0; /* Never allow tables to warp core boundaries */
+            flex-shrink: 0;
             align-items: center;
         }
 
@@ -261,17 +261,16 @@
             font-weight: bold;
             border-bottom: 2px solid #eee;
             background: #fdfdfd;
-            flex-shrink: 0; /* Lock header position */
+            flex-shrink: 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
             color: var(--primary-color);
         }
 
-        /* DYNAMIC RECEIPT WRAPPER: ELONGATES OR SHRINKS TO SECURE THE PRINT ACTIONS AT BOTTOM */
         .receipt-items {
-            flex: 1 1 auto; /* Grow and shrink dynamically based on content volume */
-            overflow-y: auto; /* Internal scroll ONLY if row count exceeds window scale */
+            flex: 1 1 auto;
+            overflow-y: auto;
             padding: 12px;
             background: #fff;
         }
@@ -320,28 +319,23 @@
             color: var(--dark-text);
         }
 
-        /* CHECKOUT FOOTER SECTION: LOCKED SECURELY ON ALL TERMINALS */
+        /* CHECKOUT FOOTER SECTION - STRUCTURALLY REORDERED FOR TERMINALS */
         .checkout-section {
-            padding: 15px;
+            padding: 12px 15px;
             background: #f1f5f9;
             border-top: 2px solid #cbd5e1;
-            flex-shrink: 0; /* STRICTLY FORBID THE SYSTEM FROM CUTTING THIS VIEW OFF */
-            margin-top: auto; /* Always force directly down to the floor */
-        }
-
-        .total-row {
+            flex-shrink: 0;
+            margin-top: auto;
             display: flex;
-            justify-content: space-between;
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 12px;
-            color: var(--primary-color);
+            flex-direction: column;
         }
 
+        /* Printing triggers positioned strictly above costs */
         .action-btns {
             display: flex;
             flex-direction: column;
             gap: 8px;
+            margin-bottom: 12px; 
         }
 
         .btn {
@@ -370,6 +364,17 @@
             background-color: var(--success-green);
         }
         .btn-payment:active { background-color: #27ae60; }
+
+        /* Total calculation line pinned to the baseline */
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 19px;
+            font-weight: 800;
+            color: var(--primary-color);
+            padding-top: 4px;
+            border-top: 1px dashed #cbd5e1;
+        }
 
         /* Thermal Xprinter rules */
         #thermal-invoice-printout {
@@ -920,11 +925,6 @@
             </div>
 
         <div class="checkout-section">
-            <div class="total-row">
-                <span>Total:</span>
-                <span id="grand-total">GHS 0.00</span>
-            </div>
-            
             <div class="action-btns">
                 <button class="btn btn-kitchen" onclick="printKitchenOrder()">
                     🖨️ Print for Kitchen
@@ -932,6 +932,11 @@
                 <button class="btn btn-payment" onclick="printPaymentBill()">
                     💵 Print for Payment
                 </button>
+            </div>
+
+            <div class="total-row">
+                <span>Total:</span>
+                <span id="grand-total">GHS 0.00</span>
             </div>
         </div>
     </div>
