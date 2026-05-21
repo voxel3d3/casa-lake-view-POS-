@@ -799,7 +799,7 @@
                     <span class="item-name">Red Label (Bt)</span>
                     <span class="item-price">GHS 600</span>
                 </div>
-                <div class="item-card" data-category="drink" onclick="addToOrder('Baileys 700ml (Bottle)', 600)">
+                <div class="item-card" data-category="drink" onclick="bold-on">
                     <span class="item-name">Baileys 700ml</span>
                     <span class="item-price">GHS 600</span>
                 </div>
@@ -1030,6 +1030,7 @@
         const ESC_BOLD_OFF = [0x1B, 0x45, 0x00];
         const ESC_FEED_AND_CUT = [0x1D, 0x56, 0x42, 0x03];
 
+        // UPDATED: Kitchen ticket layout including Date and individual/total Pricing
         async function printKitchenOrder() {
             const activeOrderArray = tableOrders[currentTable];
             const foodItems = activeOrderArray.filter(item => item.category === 'food');
@@ -1039,16 +1040,25 @@
                 return;
             }
 
+            const dateStr = new Date().toLocaleDateString();
             const timestamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             
             let commands = [];
             commands.push(ESC_INIT);
             commands.push(ESC_CENTER, ESC_BOLD_ON, "KITCHEN ORDER TICKET\n", `TABLE: ${currentTable}\n`);
-            commands.push(ESC_BOLD_OFF, `Time: ${timestamp}\n`);
+            commands.push(ESC_BOLD_OFF, `Date: ${dateStr}  |  Time: ${timestamp}\n`);
             commands.push("------------------------------------------------\n", ESC_LEFT);
 
             foodItems.forEach(item => {
+                const totalItemPrice = item.price * item.qty;
+                
+                // Bold text checkbox and descriptor line
                 commands.push(ESC_BOLD_ON, `[ ] ${item.qty} x ${item.name}\n`, ESC_BOLD_OFF);
+                
+                // Sub-detail price block spaced evenly across 48 positions (80mm)
+                let qtyPriceDetail = `    ${item.qty} x GHS ${item.price.toFixed(2)}`;
+                let totalDetail = `GHS ${totalItemPrice.toFixed(2)}`;
+                commands.push(qtyPriceDetail.padEnd(30) + totalDetail.padStart(18) + "\n");
             });
 
             commands.push("------------------------------------------------\n", ESC_CENTER);
