@@ -191,7 +191,7 @@
             max-height: 100vh;
         }
 
-        /* NEW: TABLE SELECTION ROW */
+        /* TABLE SELECTION ROW WITH ADAPTIVE OVERFLOW */
         .table-selector-bar {
             display: flex;
             overflow-x: auto;
@@ -200,6 +200,16 @@
             gap: 6px;
             border-bottom: 2px solid #cbd5e1;
             flex-shrink: 0;
+            align-items: center;
+        }
+
+        /* Webkit scrollbar adjustments for sleek tracking */
+        .table-selector-bar::-webkit-scrollbar {
+            height: 4px;
+        }
+        .table-selector-bar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
         }
 
         .table-btn {
@@ -214,19 +224,31 @@
             min-width: 55px;
             text-align: center;
             transition: all 0.15s ease;
+            flex-shrink: 0;
         }
 
-        /* Active selected table look */
         .table-btn.selected-active {
             border-color: var(--primary-color);
             box-shadow: inset 0 0 0 2px var(--primary-color);
         }
 
-        /* Running unpaid table layout indicator */
         .table-btn.has-orders {
             background-color: var(--danger-red);
             color: white;
             border-color: #c0392b;
+        }
+
+        /* NEW: ADD TABLE CONTROLLER LOOK */
+        .add-table-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+            font-size: 16px;
+            min-width: 45px;
+            padding: 8px 10px;
+        }
+        .add-table-btn:active {
+            background-color: var(--primary-color);
         }
 
         .order-header {
@@ -841,7 +863,7 @@
 
     <div class="order-container">
         
-        <div class="table-selector-bar">
+        <div class="table-selector-bar" id="tables-container">
             <button class="table-btn selected-active" id="btn-T1" onclick="switchTable('T1')">T1</button>
             <button class="table-btn" id="btn-T2" onclick="switchTable('T2')">T2</button>
             <button class="table-btn" id="btn-T3" onclick="switchTable('T3')">T3</button>
@@ -852,6 +874,7 @@
             <button class="table-btn" id="btn-T8" onclick="switchTable('T8')">T8</button>
             <button class="table-btn" id="btn-T9" onclick="switchTable('T9')">T9</button>
             <button class="table-btn" id="btn-T10" onclick="switchTable('T10')">T10</button>
+            <button class="table-btn add-table-btn" id="add-table-action" onclick="createNewTable()">+</button>
         </div>
 
         <div class="order-header">
@@ -875,12 +898,13 @@
     </div>
 
     <script>
-        // Memory banks for individual tables T1 through T10
+        // Master storage initialization
         const tableOrders = {
             'T1': [], 'T2': [], 'T3': [], 'T4': [], 'T5': [],
             'T6': [], 'T7': [], 'T8': [], 'T9': [], 'T10': []
         };
         
+        let totalTablesCount = 10; // Tracker to calculate sequential numbers
         let currentTable = 'T1';
         let currentMainMode = 'foods';
         let currentFoodSubTab = 'breakfast';
@@ -908,30 +932,57 @@
             updateTableIndicators();
         };
 
-        // NEW: Jump between tables smoothly without losing data
+        // Switch active table focus
         function switchTable(tableId) {
             currentTable = tableId;
             
-            // Toggle visual selected layout class states
             document.querySelectorAll('.table-selector-bar .table-btn').forEach(btn => {
                 btn.classList.remove('selected-active');
             });
-            document.getElementById(`btn-${tableId}`).classList.add('selected-active');
             
-            // Adjust panel sub-headers
+            const targetedBtn = document.getElementById(`btn-${tableId}`);
+            if (targetedBtn) targetedBtn.classList.add('selected-active');
+            
             document.getElementById('active-table-title').innerText = `TABLE ${tableId}`;
-            
             updateReceiptDisplay();
         }
 
-        // NEW: Scans tables and toggles Red color background if they contain pending items
+        // NEW: Handles creation of dynamic tables sequentially 
+        function createNewTable() {
+            totalTablesCount++;
+            const newTableId = `T${totalTablesCount}`;
+            
+            // Set up empty memory array for the new table inside the object ledger
+            tableOrders[newTableId] = [];
+            
+            // Create the new layout button element
+            const newButton = document.createElement('button');
+            newButton.className = 'table-btn';
+            newButton.id = `btn-${newTableId}`;
+            newButton.innerText = newTableId;
+            newButton.setAttribute('onclick', `switchTable('${newTableId}')`);
+            
+            // Inject the button right before the "+" action button
+            const addActionBtn = document.getElementById('add-table-action');
+            document.getElementById('tables-container').insertBefore(newButton, addActionBtn);
+            
+            // Instantly transition view focus over to the newly generated setup
+            switchTable(newTableId);
+            
+            // Scroll the table bar automatically to bring the new option into focus
+            document.getElementById('tables-container').scrollLeft = document.getElementById('tables-container').scrollWidth;
+        }
+
+        // Color updates for tracking balance loops
         function updateTableIndicators() {
             for (let tableId in tableOrders) {
                 const btn = document.getElementById(`btn-${tableId}`);
-                if (tableOrders[tableId].length > 0) {
-                    btn.classList.add('has-orders');
-                } else {
-                    btn.classList.remove('has-orders');
+                if (btn) {
+                    if (tableOrders[tableId].length > 0) {
+                        btn.classList.add('has-orders');
+                    } else {
+                        btn.classList.remove('has-orders');
+                    }
                 }
             }
         }
@@ -1006,7 +1057,6 @@
             document.getElementById(subTabId).classList.add('active');
         }
 
-        // Updated: Appends items targeted specifically to the active selected table arrays
         function addToOrder(name, price) {
             const activeOrderArray = tableOrders[currentTable];
             const existingItem = activeOrderArray.find(item => item.name === name);
