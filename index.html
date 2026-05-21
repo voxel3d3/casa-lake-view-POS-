@@ -1027,7 +1027,7 @@
         const ESC_FEED_AND_CUT = [0x1D, 0x56, 0x42, 0x03];
 
         // UPDATED: Kitchen ticket layout including Date and individual/total Pricing
-        async function printKitchenOrder() {
+        async function printKitchenOrder(waiterName) {
             const activeOrderArray = tableOrders[currentTable];
             const foodItems = activeOrderArray.filter(item => item.category === 'food');
 
@@ -1042,7 +1042,7 @@
             let commands = [];
             commands.push(ESC_INIT);
             commands.push(ESC_CENTER, ESC_BOLD_ON, "KITCHEN ORDER TICKET\n", `TABLE: ${currentTable}\n`);
-            commands.push(ESC_BOLD_OFF, `Date: ${dateStr}  |  Time: ${timestamp}\n`);
+            commands.push(ESC_BOLD_OFF, `Date: ${dateStr}  |  Time: ${timestamp}\n`);commands.push(" waiter: " + waiterName + "\n");
             commands.push("------------------------------------------------\n", ESC_LEFT);
 
             foodItems.forEach(item => {
@@ -1064,7 +1064,7 @@
             await sendRawToUsbPrinter(commands);
         }
 
-        async function printPaymentBill() {
+        async function printPaymentBill(waiterName) {
             const activeOrderArray = tableOrders[currentTable];
 
             if (activeOrderArray.length === 0) {
@@ -1079,7 +1079,7 @@
             let commands = [];
             commands.push(ESC_INIT);
             commands.push(ESC_CENTER, ESC_BOLD_ON, "CASA LAKE VIEW RESORT\n", ESC_BOLD_OFF, "Abono, Lake Bosomtwe\n");
-            commands.push(ESC_BOLD_ON, "CUSTOMER BILL\n\n", ESC_BOLD_OFF);
+            commands.push(ESC_BOLD_ON, "CUSTOMER BILL\n\n", ESC_BOLD_OFF);commands.push("Waiter: " + waiterName + "\n\n");
             
             commands.push(ESC_LEFT, `Table: ${currentTable}`.padEnd(24) + `Date: ${dateStr}`.padStart(24) + "\n");
             commands.push(`Staff: Front Desk`.padEnd(24) + `Time: ${timeStr}`.padStart(24) + "\n");
