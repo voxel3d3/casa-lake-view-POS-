@@ -181,7 +181,7 @@
             font-size: 14px;
         }
 
-        /* RIGHT SIDE: FIXED RECEIPT SYSTEM */
+        /* RIGHT SIDE: RECEIPT AND TABLES CONTAINER */
         .order-container {
             width: 35%;
             display: flex;
@@ -191,13 +191,55 @@
             max-height: 100vh;
         }
 
+        /* NEW: TABLE SELECTION ROW */
+        .table-selector-bar {
+            display: flex;
+            overflow-x: auto;
+            background: #e2e8f0;
+            padding: 8px;
+            gap: 6px;
+            border-bottom: 2px solid #cbd5e1;
+            flex-shrink: 0;
+        }
+
+        .table-btn {
+            padding: 10px 14px;
+            font-size: 14px;
+            font-weight: bold;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            background: #f1f5f9;
+            color: #475569;
+            cursor: pointer;
+            min-width: 55px;
+            text-align: center;
+            transition: all 0.15s ease;
+        }
+
+        /* Active selected table look */
+        .table-btn.selected-active {
+            border-color: var(--primary-color);
+            box-shadow: inset 0 0 0 2px var(--primary-color);
+        }
+
+        /* Running unpaid table layout indicator */
+        .table-btn.has-orders {
+            background-color: var(--danger-red);
+            color: white;
+            border-color: #c0392b;
+        }
+
         .order-header {
-            padding: 20px;
-            font-size: 20px;
+            padding: 15px 20px;
+            font-size: 18px;
             font-weight: bold;
             border-bottom: 2px solid #eee;
             background: #fdfdfd;
             flex-shrink: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--primary-color);
         }
 
         .receipt-items {
@@ -798,7 +840,24 @@
     </div>
 
     <div class="order-container">
-        <div class="order-header">Current Order</div>
+        
+        <div class="table-selector-bar">
+            <button class="table-btn selected-active" id="btn-T1" onclick="switchTable('T1')">T1</button>
+            <button class="table-btn" id="btn-T2" onclick="switchTable('T2')">T2</button>
+            <button class="table-btn" id="btn-T3" onclick="switchTable('T3')">T3</button>
+            <button class="table-btn" id="btn-T4" onclick="switchTable('T4')">T4</button>
+            <button class="table-btn" id="btn-T5" onclick="switchTable('T5')">T5</button>
+            <button class="table-btn" id="btn-T6" onclick="switchTable('T6')">T6</button>
+            <button class="table-btn" id="btn-T7" onclick="switchTable('T7')">T7</button>
+            <button class="table-btn" id="btn-T8" onclick="switchTable('T8')">T8</button>
+            <button class="table-btn" id="btn-T9" onclick="switchTable('T9')">T9</button>
+            <button class="table-btn" id="btn-T10" onclick="switchTable('T10')">T10</button>
+        </div>
+
+        <div class="order-header">
+            <span>Current Order</span>
+            <span id="active-table-title" style="background: var(--accent-color); color: white; padding: 4px 10px; border-radius: 4px; font-size: 14px;">TABLE T1</span>
+        </div>
         
         <div class="receipt-items" id="receipt-items-container">
             </div>
@@ -816,12 +875,17 @@
     </div>
 
     <script>
-        let currentOrder = [];
+        // Memory banks for individual tables T1 through T10
+        const tableOrders = {
+            'T1': [], 'T2': [], 'T3': [], 'T4': [], 'T5': [],
+            'T6': [], 'T7': [], 'T8': [], 'T9': [], 'T10': []
+        };
+        
+        let currentTable = 'T1';
         let currentMainMode = 'foods';
         let currentFoodSubTab = 'breakfast';
         let currentDrinkSubTab = 'soft-drinks';
 
-        // Automatically index all items into master search list
         const allItemsList = [];
         function rebuildSearchIndex() {
             allItemsList.length = 0;
@@ -838,8 +902,39 @@
             });
         }
 
-        // Run index on load
-        window.onload = rebuildSearchIndex;
+        window.onload = function() {
+            rebuildSearchIndex();
+            updateReceiptDisplay();
+            updateTableIndicators();
+        };
+
+        // NEW: Jump between tables smoothly without losing data
+        function switchTable(tableId) {
+            currentTable = tableId;
+            
+            // Toggle visual selected layout class states
+            document.querySelectorAll('.table-selector-bar .table-btn').forEach(btn => {
+                btn.classList.remove('selected-active');
+            });
+            document.getElementById(`btn-${tableId}`).classList.add('selected-active');
+            
+            // Adjust panel sub-headers
+            document.getElementById('active-table-title').innerText = `TABLE ${tableId}`;
+            
+            updateReceiptDisplay();
+        }
+
+        // NEW: Scans tables and toggles Red color background if they contain pending items
+        function updateTableIndicators() {
+            for (let tableId in tableOrders) {
+                const btn = document.getElementById(`btn-${tableId}`);
+                if (tableOrders[tableId].length > 0) {
+                    btn.classList.add('has-orders');
+                } else {
+                    btn.classList.remove('has-orders');
+                }
+            }
+        }
 
         function searchMenu() {
             const query = document.getElementById('menu-search').value.toLowerCase().trim();
@@ -911,17 +1006,21 @@
             document.getElementById(subTabId).classList.add('active');
         }
 
+        // Updated: Appends items targeted specifically to the active selected table arrays
         function addToOrder(name, price) {
-            const existingItem = currentOrder.find(item => item.name === name);
+            const activeOrderArray = tableOrders[currentTable];
+            const existingItem = activeOrderArray.find(item => item.name === name);
+            
             if (existingItem) {
                 existingItem.qty += 1;
             } else {
-                currentOrder.push({ name: name, price: price, qty: 1 });
+                activeOrderArray.push({ name: name, price: price, qty: 1 });
             }
+            
             updateReceiptDisplay();
+            updateTableIndicators();
         }
 
-        // Global delegation click catching for generated layout clones inside search views
         document.querySelector('.menu-content-wrapper').addEventListener('click', function(e) {
             const card = e.target.closest('.item-card');
             if (card && document.getElementById('search-results-view').style.display === 'grid') {
@@ -934,22 +1033,27 @@
         });
 
         function changeQty(name, amount) {
-            const item = currentOrder.find(item => item.name === name);
+            let activeOrderArray = tableOrders[currentTable];
+            const item = activeOrderArray.find(item => item.name === name);
             if (!item) return;
 
             item.qty += amount;
             if (item.qty <= 0) {
-                currentOrder = currentOrder.filter(i => i.name !== name);
+                tableOrders[currentTable] = activeOrderArray.filter(i => i.name !== name);
             }
+            
             updateReceiptDisplay();
+            updateTableIndicators();
         }
 
         function updateReceiptDisplay() {
             const container = document.getElementById('receipt-items-container');
             container.innerHTML = '';
             let total = 0;
+            
+            const activeOrderArray = tableOrders[currentTable];
 
-            currentOrder.forEach(item => {
+            activeOrderArray.forEach(item => {
                 const itemTotal = item.price * item.qty;
                 total += itemTotal;
 
@@ -973,21 +1077,23 @@
         }
 
         function clearOrder() {
-            if (currentOrder.length === 0) return;
-            if (confirm("Are you sure you want to clear this order?")) {
-                currentOrder = [];
+            if (tableOrders[currentTable].length === 0) return;
+            if (confirm(`Are you sure you want to clear the entire bill for Table ${currentTable}?`)) {
+                tableOrders[currentTable] = [];
                 updateReceiptDisplay();
+                updateTableIndicators();
             }
         }
 
         function processPayment() {
-            if (currentOrder.length === 0) {
+            if (tableOrders[currentTable].length === 0) {
                 alert("Please add items to the order first.");
                 return;
             }
-            alert("Order Submitted Successfully!");
-            currentOrder = [];
+            alert(`Order for Table ${currentTable} Submitted & Settled Successfully!`);
+            tableOrders[currentTable] = [];
             updateReceiptDisplay();
+            updateTableIndicators();
         }
     </script>
 </body>
