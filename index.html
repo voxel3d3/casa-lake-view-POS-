@@ -255,7 +255,7 @@
             background-color: var(--primary-color);
         }
 
-        /* PRINT ACTIONS BOX (Positioned right below table list row) */
+        /* PRINT ACTIONS BOX (Locked right below table list row) */
         .action-btns {
             display: flex;
             gap: 8px;
@@ -370,38 +370,6 @@
             font-size: 21px;
             font-weight: 800;
             color: var(--primary-color);
-        }
-
-        /* EXPLICIT AREA FOR THERMAL XPRINTER DRIVER COMPOSTING */
-        #thermal-invoice-printout {
-            display: none;
-        }
-
-        @media print {
-            body > *:not(#thermal-invoice-printout) {
-                display: none !important;
-            }
-            html, body {
-                background: #fff !important;
-                height: auto !important;
-                overflow: visible !important;
-            }
-            #thermal-invoice-printout {
-                display: block !important;
-                width: 80mm !important;
-                max-width: 80mm !important;
-                padding: 2mm !important;
-                margin: 0 !important;
-                font-family: 'Courier New', Courier, monospace !important;
-                color: #000 !important;
-                font-size: 14px !important;
-                line-height: 1.4 !important;
-            }
-            .print-center { text-align: center !important; }
-            .print-bold { font-weight: bold !important; }
-            .print-divider { border-top: 1px dashed #000 !important; margin: 3mm 0 !important; display: block !important; width: 100% !important; }
-            .print-space-between { display: flex !important; justify-content: space-between !important; width: 100% !important; }
-            .print-item-row { margin-bottom: 2mm !important; }
         }
     </style>
 </head>
@@ -943,8 +911,6 @@
         </div>
     </div>
 
-    <div id="thermal-invoice-printout"></div>
-
     <script>
         const tableOrders = {
             'T1': [], 'T2': [], 'T3': [], 'T4': [], 'T5': [],
@@ -956,6 +922,11 @@
         let currentMainMode = 'foods';
         let currentFoodSubTab = 'breakfast';
         let currentDrinkSubTab = 'soft-drinks';
+
+        // WebUSB global hardware links
+        let usbDevice = null;
+        let usbInterfaceNumber = 0;
+        let usbEndpointOut = null;
 
         const allItemsList = [];
         function rebuildSearchIndex() {
@@ -980,6 +951,158 @@
             updateReceiptDisplay();
             updateTableIndicators();
         };
+
+        async function getUsbPrinterConnection() {
+            if (usbDevice && usbDevice.opened) {
+                return usbEndpointOut;
+            }
+
+            try {
+                console.log("Requesting USB Thermal Printer device channel...");
+                usbDevice = await navigator.usb.requestDevice({
+                    filters: [{ classCode: 7 }] 
+                });
+
+                await usbDevice.open();
+                
+                if (usbDevice.configuration === null) {
+                    await usbDevice.selectConfiguration(1);
+                }
+
+                const interfaces = usbDevice.configuration.interfaces;
+                const printInterface = interfaces.find(iface => 
+                    iface.alternates.some(alt => alt.interfaceClass === 7)
+                ) || interfaces[0];
+
+                usbInterfaceNumber = printInterface.interfaceNumber;
+                await usbDevice.claimInterface(usbInterfaceNumber);
+
+                const alternate = printInterface.alternates[0];
+                const endpoint = alternate.endpoints.find(ep => ep.direction === 'out');
+                
+                if (!endpoint) {
+                    throw new Error("No bulk OUT endpoint found on this USB interface.");
+                }
+
+                usbEndpointOut = endpoint.endpointNumber;
+                return usbEndpointOut;
+
+            } catch (error) {
+                console.error("USB direct connection failed:", error);
+                alert("Could not connect directly via USB: " + error.message + "\nCheck your cable connection.");
+                return null;
+            }
+        }
+
+        function textToBytes(text) {
+            const encoder = new TextEncoder('utf-8');
+            return encoder.encode(text);
+        }
+
+        async function sendRawToUsbPrinter(commandsArray) {
+            const endpointOut = await getUsbPrinterConnection();
+            if (!endpointOut || !usbDevice) return;
+
+            let buffer = new Uint8Array();
+            for (let cmd of commandsArray) {
+                let chunk = (typeof cmd === 'string') ? textToBytes(cmd) : new Uint8Array(cmd);
+                let nextBuffer = new Uint8Array(buffer.length + chunk.length);
+                nextBuffer.set(buffer);
+                nextBuffer.set(chunk, buffer.length);
+                buffer = nextBuffer;
+            }
+
+            try {
+                await usbDevice.transferOut(endpointOut, buffer);
+            } catch (err) {
+                console.error("USB Transmission Error:", err);
+                alert("Failed to send data to printer. Please re-plug the USB cable.");
+                usbDevice = null;
+                usbEndpointOut = null;
+            }
+        }
+
+        // ESC/POS Driver Hex Command Signals
+        const ESC_INIT = [0x1B, 0x40];
+        const ESC_CENTER = [0x1B, 0x61, 0x01];
+        const ESC_LEFT = [0x1B, 0x61, 0x00];
+        const ESC_BOLD_ON = [0x1B, 0x45, 0x01];
+        const ESC_BOLD_OFF = [0x1B, 0x45, 0x00];
+        const ESC_FEED_AND_CUT = [0x1D, 0x56, 0x42, 0x03];
+
+        async function printKitchenOrder() {
+            const activeOrderArray = tableOrders[currentTable];
+            const foodItems = activeOrderArray.filter(item => item.category === 'food');
+
+            if (foodItems.length === 0) {
+                alert("There are no food items on this table to send to the kitchen.");
+                return;
+            }
+
+            const timestamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            let commands = [];
+            commands.push(ESC_INIT);
+            commands.push(ESC_CENTER, ESC_BOLD_ON, "KITCHEN ORDER TICKET\n", `TABLE: ${currentTable}\n`);
+            commands.push(ESC_BOLD_OFF, `Time: ${timestamp}\n`);
+            commands.push("------------------------------------------------\n", ESC_LEFT);
+
+            foodItems.forEach(item => {
+                commands.push(ESC_BOLD_ON, `[ ] ${item.qty} x ${item.name}\n`, ESC_BOLD_OFF);
+            });
+
+            commands.push("------------------------------------------------\n", ESC_CENTER);
+            commands.push("Casa Lake View - Kitchen Copy\n\n\n\n");
+            commands.push(ESC_FEED_AND_CUT);
+
+            await sendRawToUsbPrinter(commands);
+        }
+
+        async function printPaymentBill() {
+            const activeOrderArray = tableOrders[currentTable];
+
+            if (activeOrderArray.length === 0) {
+                alert("Cannot print an empty statement. Add items first.");
+                return;
+            }
+
+            const dateStr = new Date().toLocaleDateString();
+            const timeStr = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            let grandTotal = 0;
+
+            let commands = [];
+            commands.push(ESC_INIT);
+            commands.push(ESC_CENTER, ESC_BOLD_ON, "CASA LAKE VIEW RESORT\n", ESC_BOLD_OFF, "Abono, Lake Bosomtwe\n");
+            commands.push(ESC_BOLD_ON, "CUSTOMER BILL\n\n", ESC_BOLD_OFF);
+            
+            commands.push(ESC_LEFT, `Table: ${currentTable}`.padEnd(24) + `Date: ${dateStr}`.padStart(24) + "\n");
+            commands.push(`Staff: Front Desk`.padEnd(24) + `Time: ${timeStr}`.padStart(24) + "\n");
+            commands.push("------------------------------------------------\n");
+
+            activeOrderArray.forEach(item => {
+                const totalItemPrice = item.price * item.qty;
+                grandTotal += totalItemPrice;
+                
+                commands.push(`${item.name}\n`);
+                let qtyLine = `  ${item.qty} x GHS ${item.price.toFixed(2)}`;
+                let priceLine = `GHS ${totalItemPrice.toFixed(2)}`;
+                commands.push(qtyLine.padEnd(30) + priceLine.padStart(18) + "\n");
+            });
+
+            commands.push("------------------------------------------------\n", ESC_BOLD_ON);
+            let totalLabel = "GRAND TOTAL:";
+            let totalVal = `GHS ${grandTotal.toFixed(2)}`;
+            commands.push(totalLabel.padEnd(24) + totalVal.padStart(24) + "\n", ESC_BOLD_OFF);
+            commands.push("------------------------------------------------\n", ESC_CENTER);
+            commands.push("Thank You For Your Visit!\nPlease Settle Bill at the Front Desk.\n\n\n\n");
+            commands.push(ESC_FEED_AND_CUT);
+
+            await sendRawToUsbPrinter(commands);
+
+            tableOrders[currentTable] = [];
+            updateReceiptDisplay();
+            updateTableIndicators();
+        }
 
         function switchTable(tableId) {
             currentTable = tableId;
@@ -1162,107 +1285,6 @@
             });
 
             document.getElementById('grand-total').innerText = `GHS ${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-        }
-
-        function printKitchenOrder() {
-            const activeOrderArray = tableOrders[currentTable];
-            const foodItems = activeOrderArray.filter(item => item.category === 'food');
-
-            if (foodItems.length === 0) {
-                alert("There are no food items on this table to send to the kitchen.");
-                return;
-            }
-
-            const timestamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            let template = `
-                <div class="print-center print-bold" style="font-size: 18px;">KITCHEN ORDER TICKET</div>
-                <div class="print-center print-bold" style="font-size: 16px; margin: 1mm 0;">TABLE: ${currentTable}</div>
-                <div class="print-center" style="font-size: 12px;">Time: ${timestamp}</div>
-                <div class="print-divider"></div>
-            `;
-
-            foodItems.forEach(item => {
-                template += `
-                    <div class="print-item-row print-bold">
-                        [ ] ${item.qty} x ${item.name}
-                    </div>
-                `;
-            });
-
-            template += `
-                <div class="print-divider"></div>
-                <div class="print-center" style="font-size: 11px;">Casa Lake View - Kitchen Copy</div>
-            `;
-
-            const printContainer = document.getElementById('thermal-invoice-printout');
-            printContainer.innerHTML = template;
-            
-            setTimeout(function() {
-                window.print();
-            }, 50);
-        }
-
-        function printPaymentBill() {
-            const activeOrderArray = tableOrders[currentTable];
-
-            if (activeOrderArray.length === 0) {
-                alert("Cannot print an empty statement. Add items first.");
-                return;
-            }
-
-            const dateStr = new Date().toLocaleDateString();
-            const timeStr = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            let grandTotal = 0;
-
-            let template = `
-                <div class="print-center print-bold" style="font-size: 16px;">CASA LAKE VIEW RESORT</div>
-                <div class="print-center" style="font-size: 11px;">Abono, Lake Bosomtwe</div>
-                <div class="print-center print-bold" style="font-size: 14px; margin-top: 2mm;">CUSTOMER BILL</div>
-                <div class="print-space-between" style="font-size: 12px; margin-top: 1mm;">
-                    <span>Table: ${currentTable}</span>
-                    <span>Date: ${dateStr}</span>
-                </div>
-                <div class="print-space-between" style="font-size: 12px;">
-                    <span>Staff: Front Desk</span>
-                    <span>Time: ${timeStr}</span>
-                </div>
-                <div class="print-divider"></div>
-            `;
-
-            activeOrderArray.forEach(item => {
-                const totalItemPrice = item.price * item.qty;
-                grandTotal += totalItemPrice;
-                template += `
-                    <div class="print-item-row">
-                        <div>${item.name}</div>
-                        <div class="print-space-between" style="font-size: 13px; padding-left: 3mm;">
-                            <span>${item.qty} x GHS ${item.price.toFixed(2)}</span>
-                            <span>GHS ${totalItemPrice.toFixed(2)}</span>
-                        </div>
-                    </div>
-                `;
-            });
-
-            template += `
-                <div class="print-divider"></div>
-                <div class="print-space-between print-bold" style="font-size: 16px;">
-                    <span>GRAND TOTAL:</span>
-                    <span>GHS ${grandTotal.toFixed(2)}</span>
-                </div>
-                <div class="print-divider"></div>
-                <div class="print-center" style="font-size: 12px; margin-top: 3mm;">Thank You For Your Visit!</div>
-                <div class="print-center" style="font-size: 10px; color:#555;">Please Settle Bill at the Front Desk.</div>
-            `;
-
-            const printContainer = document.getElementById('thermal-invoice-printout');
-            printContainer.innerHTML = template;
-            
-            setTimeout(function() {
-                window.print();
-                tableOrders[currentTable] = [];
-                updateReceiptDisplay();
-                updateTableIndicators();
-            }, 50);
         }
     </script>
 </body>
