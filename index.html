@@ -799,10 +799,10 @@
                     <span class="item-name">Red Label (Bt)</span>
                     <span class="item-price">GHS 600</span>
                 </div>
-                <div class="item-card" data-category="drink" onclick="bold-on">
-                    <span class="item-name">Baileys 700ml</span>
-                    <span class="item-price">GHS 600</span>
-                </div>
+                <div class="item-card" data-category="drink" onclick="addToOrder('Baileys 700ml', 600)">
+    <span class="item-name">Baileys 700ml</span>
+    <span class="item-price">GHS 600</span>
+</div>
                 <div class="item-card" data-category="drink" onclick="addToOrder('Jagermeister 1.75L (Bottle)', 2000)">
                     <span class="item-name">Jagermeister 1.75L</span>
                     <span class="item-price">GHS 2,000</span>
@@ -978,8 +978,12 @@ function showModal(callback) {
             try {
                 console.log("Requesting USB Thermal Printer device channel...");
                 usbDevice = await navigator.usb.requestDevice({
-                    filters: [{ classCode: 7 }] 
-                });
+    filters: [
+        { vendorId: 0x0483 },
+        { vendorId: 0x0416 },
+        { classCode: 7 }
+    ]
+});
 
                 await usbDevice.open();
                 
@@ -1050,6 +1054,7 @@ function showModal(callback) {
 
         // UPDATED: Kitchen ticket layout including Date and individual/total Pricing
         async function printKitchenOrder(staffName, method) {
+
     const activeOrderArray = tableOrders[currentTable];
     const foodItems = activeOrderArray.filter(item => item.category === 'food');
 
@@ -1059,68 +1064,121 @@ function showModal(callback) {
     }
 
     const dateStr = new Date().toLocaleDateString();
-    const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    
-    let commands = [];
-    
-    // Adding your new popup data
-    commands.push("Staff: " + staffName + "\n");
-    commands.push("Payment: " + method + "\n");
-    commands.push("--------------------------------\n");
-    
-    // Proceed with your original layout
-    commands.push(ESC_INIT);
-    commands.push(ESC_CENTER, ESC_BOLD_ON, "KITCHEN ORDER TICKET\n", `TABLE: ${currentTable}\n`);
-    commands.push(ESC_BOLD_OFF, `Date: ${dateStr}  |  Time: ${timestamp}\n`);
-    commands.push("------------------------------------------------\n", ESC_LEFT);
-
-    foodItems.forEach(item => {
-        const totalItemPrice = item.price * item.qty;
-        commands.push(ESC_BOLD_ON, `[ ] ${item.qty} x ${item.name}\n`, ESC_BOLD_OFF);
-        let qtyPriceDetail = `    ${item.qty} x GHS ${item.price.toFixed(2)}`;
-        let totalDetail = `GHS ${totalItemPrice.toFixed(2)}`;
-        commands.push(qtyPriceDetail.padEnd(30) + totalDetail + "\n");
+    const timestamp = new Date().toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit'
     });
 
-    await sendToPrinter(commands);
+    let commands = [];
+
+    commands.push(ESC_INIT);
+
+    commands.push(
+        ESC_CENTER,
+        ESC_BOLD_ON,
+        "CASA LAKE VIEW RESORT\n",
+        "KITCHEN ORDER\n",
+        ESC_BOLD_OFF
+    );
+
+    commands.push("--------------------------------\n");
+
+    commands.push(`Table: ${currentTable}\n`);
+    commands.push(`Staff: ${staffName}\n`);
+    commands.push(`Payment: ${method}\n`);
+    commands.push(`Date: ${dateStr} ${timestamp}\n`);
+
+    commands.push("--------------------------------\n");
+
+    commands.push(ESC_LEFT);
+
+    foodItems.forEach(item => {
+
+        const totalItemPrice = item.price * item.qty;
+
+        commands.push(
+            `${item.qty} x ${item.name}\n`
+        );
+
+        commands.push(
+            `GHS ${totalItemPrice.toFixed(2)}\n`
+        );
+
+        commands.push("--------------------------------\n");
+    });
+
+    commands.push("\n\n\n");
+
+    commands.push(ESC_FEED_AND_CUT);
+
+    await sendRawToUsbPrinter(commands);
 }
       async function printPaymentBill(staffName, method) {
+
     const activeOrderArray = tableOrders[currentTable];
-    
-    // Check if there is an order to print
+
     if (!activeOrderArray || activeOrderArray.length === 0) {
-        alert("There are no items on this table to print a bill.");
+        alert("There are no items on this table.");
         return;
     }
 
     const dateStr = new Date().toLocaleDateString();
-    const timestamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-    
-    let commands = [];
-    
-    // Add the new details (Staff & Payment Method)
-    commands.push("Staff: " + staffName + "\n");
-    commands.push("Payment: " + method + "\n");
-    commands.push("--------------------------------\n");
-    
-    // Add your receipt header
-    commands.push(ESC_INIT);
-    commands.push(ESC_CENTER, ESC_BOLD_ON, "CUSTOMER BILL\n", `TABLE: ${currentTable}\n`);
-    commands.push(ESC_BOLD_OFF, `Date: ${dateStr}  |  Time: ${timestamp}\n`);
-    commands.push("------------------------------------------------\n", ESC_LEFT);
-
-    // Loop through all items to add to the receipt
-    activeOrderArray.forEach(item => {
-        const totalItemPrice = item.price * item.qty;
-        commands.push(`${item.name} x${item.qty} - GHS ${totalItemPrice.toFixed(2)}\n`);
+    const timestamp = new Date().toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit'
     });
 
-    // Add a simple total line (optional, ensure this matches your logic)
-    // const totalBill = activeOrderArray.reduce((sum, item) => sum + (item.price * item.qty), 0);
-    // commands.push("--------------------------------\n");
-    // commands.push(`TOTAL: GHS ${totalBill.toFixed(2)}\n`);
+    let totalBill = 0;
 
-    await sendToPrinter(commands);
+    let commands = [];
+
+    commands.push(ESC_INIT);
+
+    commands.push(
+        ESC_CENTER,
+        ESC_BOLD_ON,
+        "CASA LAKE VIEW RESORT\n",
+        "CUSTOMER BILL\n",
+        ESC_BOLD_OFF
+    );
+
+    commands.push("--------------------------------\n");
+
+    commands.push(`Table: ${currentTable}\n`);
+    commands.push(`Staff: ${staffName}\n`);
+    commands.push(`Payment: ${method}\n`);
+    commands.push(`Date: ${dateStr} ${timestamp}\n`);
+
+    commands.push("--------------------------------\n");
+
+    commands.push(ESC_LEFT);
+
+    activeOrderArray.forEach(item => {
+
+        const itemTotal = item.price * item.qty;
+
+        totalBill += itemTotal;
+
+        commands.push(
+            `${item.name}\n`
+        );
+
+        commands.push(
+            `${item.qty} x ${item.price.toFixed(2)} = GHS ${itemTotal.toFixed(2)}\n`
+        );
+
+        commands.push("--------------------------------\n");
+    });
+
+    commands.push(ESC_BOLD_ON);
+    commands.push(`TOTAL: GHS ${totalBill.toFixed(2)}\n`);
+    commands.push(ESC_BOLD_OFF);
+
+    commands.push("\n\n\n");
+
+    commands.push(ESC_FEED_AND_CUT);
+
+    await sendRawToUsbPrinter(commands);
 }
 
 
