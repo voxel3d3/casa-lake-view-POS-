@@ -934,7 +934,8 @@ function showModal(callback) {
             'T1': [], 'T2': [], 'T3': [], 'T4': [], 'T5': [],
             'T6': [], 'T7': [], 'T8': [], 'T9': [], 'T10': []
         };
-        
+        // Stores completed paid orders
+let endOfDayOrders = [];
         let totalTablesCount = 10; 
         let currentTable = 'T1';
         let currentMainMode = 'foods';
@@ -1123,6 +1124,7 @@ function showModal(callback) {
     }
 
     const dateStr = new Date().toLocaleDateString();
+
     const timestamp = new Date().toLocaleTimeString([], {
         hour: '2-digit',
         minute: '2-digit'
@@ -1145,7 +1147,7 @@ function showModal(callback) {
     commands.push("--------------------------------\n");
 
     commands.push(`Table: ${currentTable}\n`);
-    commands.push(`Staff: ${staffName}\n`);
+    commands.push(`Waiter: ${staffName}\n`);
     commands.push(`Payment: ${method}\n`);
     commands.push(`Date: ${dateStr} ${timestamp}\n`);
 
@@ -1159,15 +1161,27 @@ function showModal(callback) {
 
         totalBill += itemTotal;
 
-        commands.push(
-            `${item.name}\n`
-        );
+        commands.push(`${item.name}\n`);
 
         commands.push(
             `${item.qty} x ${item.price.toFixed(2)} = GHS ${itemTotal.toFixed(2)}\n`
         );
 
         commands.push("--------------------------------\n");
+
+        // SAVE INTO END OF DAY REPORT
+        endOfDayOrders.push({
+            table: currentTable,
+            item: item.name,
+            category: item.category,
+            qty: item.qty,
+            price: item.price,
+            total: itemTotal,
+            paymentMethod: method,
+            waiter: staffName,
+            date: `${dateStr} ${timestamp}`
+        });
+
     });
 
     commands.push(ESC_BOLD_ON);
@@ -1179,6 +1193,16 @@ function showModal(callback) {
     commands.push(ESC_FEED_AND_CUT);
 
     await sendRawToUsbPrinter(commands);
+
+    // CLEAR CURRENT TABLE AFTER PAYMENT
+    tableOrders[currentTable] = [];
+
+    updateReceiptDisplay();
+    updateTableIndicators();
+
+    generateEndOfDayReport();
+
+    alert("Payment completed and moved to End of Day Report.");
 }
 
 
@@ -1363,8 +1387,183 @@ function showModal(callback) {
             });
 
             document.getElementById('grand-total').innerText = `GHS ${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+        } function generateEndOfDayReport() {
+
+    const reportContainer = document.getElementById('report-container');
+
+    if (endOfDayOrders.length === 0) {
+        reportContainer.innerHTML = "<p>No completed sales yet.</p>";
+        return;
+    }
+
+    let foodHTML = "";
+    let drinksHTML = "";
+
+    let grandTotal = 0;
+
+    endOfDayOrders.forEach(order => {
+
+        grandTotal += order.total;
+
+        const row = `
+            <tr>
+                <td>${order.item}</td>
+                <td>${order.qty}</td>
+                <td>GHS ${order.total.toFixed(2)}</td>
+                <td>${order.paymentMethod}</td>
+                <td>${order.waiter}</td>
+            </tr>
+        `;
+
+        if (order.category === "food") {
+            foodHTML += row;
+        } else {
+            drinksHTML += row;
         }
-    </script><div id="print-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
+
+    });
+
+    reportContainer.innerHTML = `
+
+        <h4 style="margin-top:20px;">FOOD SALES</h4>
+
+        <table border="1" cellpadding="8" cellspacing="0" width="100%" style="border-collapse:collapse; background:white;">
+            <tr style="background:#eee;">
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Total</th>
+                <th>Payment</th>
+                <th>Waiter</th>
+            </tr>
+
+            ${foodHTML}
+
+        </table>
+
+        <h4 style="margin-top:30px;">DRINK SALES</h4>
+
+        <table border="1" cellpadding="8" cellspacing="0" width="100%" style="border-collapse:collapse; background:white;">
+            <tr style="background:#eee;">
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Total</th>
+                <th>Payment</th>
+                <th>Waiter</th>
+            </tr>
+
+            ${drinksHTML}
+
+        </table>
+
+        <div style="margin-top:25px; font-size:22px; font-weight:bold; color:#1a3a5f;">
+            GRAND TOTAL: GHS ${grandTotal.toFixed(2)}
+        </div>
+
+        <button onclick="printEndOfDayReport()"
+            style="
+                margin-top:20px;
+                padding:12px 20px;
+                background:#27ae60;
+                color:white;
+                border:none;
+                border-radius:6px;
+                cursor:pointer;
+                font-size:16px;
+                font-weight:bold;
+            ">
+
+            🖨️ Print Final End of Day Report
+
+        </button>
+    `;
+}
+
+    </script><div id="print-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; async function printEndOfDayReport() {
+
+    if (endOfDayOrders.length === 0) {
+        alert("No completed sales to print.");
+        return;
+    }
+
+    let commands = [];
+
+    commands.push(ESC_INIT);
+
+    commands.push(
+        ESC_CENTER,
+        ESC_BOLD_ON,
+        "CASA LAKE VIEW RESORT\n",
+        "END OF DAY REPORT\n",
+        ESC_BOLD_OFF
+    );
+
+    commands.push("--------------------------------\n");
+
+    let foodTotal = 0;
+    let drinkTotal = 0;
+
+    commands.push("FOOD SALES\n");
+    commands.push("--------------------------------\n");
+
+    endOfDayOrders
+        .filter(order => order.category === 'food')
+        .forEach(order => {
+
+            commands.push(`${order.item}\n`);
+
+            commands.push(
+                `${order.qty} x GHS ${order.price.toFixed(2)} = GHS ${order.total.toFixed(2)}\n`
+            );
+
+            commands.push(
+                `Pay: ${order.paymentMethod} | Waiter: ${order.waiter}\n`
+            );
+
+            commands.push("--------------------------------\n");
+
+            foodTotal += order.total;
+        });
+
+    commands.push("\nDRINK SALES\n");
+    commands.push("--------------------------------\n");
+
+    endOfDayOrders
+        .filter(order => order.category === 'drink')
+        .forEach(order => {
+
+            commands.push(`${order.item}\n`);
+
+            commands.push(
+                `${order.qty} x GHS ${order.price.toFixed(2)} = GHS ${order.total.toFixed(2)}\n`
+            );
+
+            commands.push(
+                `Pay: ${order.paymentMethod} | Waiter: ${order.waiter}\n`
+            );
+
+            commands.push("--------------------------------\n");
+
+            drinkTotal += order.total;
+        });
+
+    const grandTotal = foodTotal + drinkTotal;
+
+    commands.push(ESC_BOLD_ON);
+
+    commands.push(`FOOD TOTAL: GHS ${foodTotal.toFixed(2)}\n`);
+    commands.push(`DRINK TOTAL: GHS ${drinkTotal.toFixed(2)}\n`);
+    commands.push(`GRAND TOTAL: GHS ${grandTotal.toFixed(2)}\n`);
+
+    commands.push(ESC_BOLD_OFF);
+
+    commands.push("\n\n\n");
+
+    commands.push(ESC_FEED_AND_CUT);
+
+    await sendRawToUsbPrinter(commands);
+
+    alert("End of Day Report Printed Successfully.");
+} background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
     <div style="background:white; padding:20px; border-radius:10px; width:280px; text-align:center;">
         <h3>Bill Details</h3>
         <input type="text" id="staff-name-input" placeholder="Waiter Name" style="width:90%; padding:8px; margin:10px 0;">
