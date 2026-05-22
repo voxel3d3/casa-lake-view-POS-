@@ -1478,7 +1478,127 @@ let endOfDayOrders = [];
     `;
 }
 
-    </script><div id="print-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; async function printEndOfDayReport() {
+async function printEndOfDayReport() {
+
+    if (endOfDayOrders.length === 0) {
+        alert("No completed sales to print.");
+        return;
+    }
+
+    let commands = [];
+
+    commands.push(ESC_INIT);
+
+    commands.push(
+        ESC_CENTER,
+        ESC_BOLD_ON,
+        "CASA LAKE VIEW RESORT\n",
+        "END OF DAY REPORT\n",
+        ESC_BOLD_OFF
+    );
+
+    commands.push("--------------------------------\n");
+
+    const now = new Date();
+
+    commands.push(
+        `Date: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}\n`
+    );
+
+    commands.push("--------------------------------\n");
+
+    let foodTotal = 0;
+    let drinkTotal = 0;
+
+    // FOOD SALES
+    commands.push(ESC_BOLD_ON);
+    commands.push("FOOD SALES\n");
+    commands.push(ESC_BOLD_OFF);
+
+    commands.push("--------------------------------\n");
+
+    endOfDayOrders
+        .filter(order => order.category === 'food')
+        .forEach(order => {
+
+            commands.push(`${order.item}\n`);
+
+            commands.push(
+                `${order.qty} x GHS ${order.price.toFixed(2)} = GHS ${order.total.toFixed(2)}\n`
+            );
+
+            commands.push(
+                `Pay: ${order.paymentMethod} | Waiter: ${order.waiter}\n`
+            );
+
+            commands.push("--------------------------------\n");
+
+            foodTotal += order.total;
+        });
+
+    // DRINK SALES
+    commands.push("\n");
+
+    commands.push(ESC_BOLD_ON);
+    commands.push("DRINK SALES\n");
+    commands.push(ESC_BOLD_OFF);
+
+    commands.push("--------------------------------\n");
+
+    endOfDayOrders
+        .filter(order => order.category === 'drink')
+        .forEach(order => {
+
+            commands.push(`${order.item}\n`);
+
+            commands.push(
+                `${order.qty} x GHS ${order.price.toFixed(2)} = GHS ${order.total.toFixed(2)}\n`
+            );
+
+            commands.push(
+                `Pay: ${order.paymentMethod} | Waiter: ${order.waiter}\n`
+            );
+
+            commands.push("--------------------------------\n");
+
+            drinkTotal += order.total;
+        });
+
+    const grandTotal = foodTotal + drinkTotal;
+
+    commands.push("\n");
+
+    commands.push(ESC_BOLD_ON);
+
+    commands.push(`FOOD TOTAL : GHS ${foodTotal.toFixed(2)}\n`);
+    commands.push(`DRINK TOTAL: GHS ${drinkTotal.toFixed(2)}\n`);
+    commands.push(`GRAND TOTAL: GHS ${grandTotal.toFixed(2)}\n`);
+
+    commands.push(ESC_BOLD_OFF);
+
+    commands.push("\n\n\n");
+
+    commands.push(ESC_FEED_AND_CUT);
+
+    await sendRawToUsbPrinter(commands);
+
+    alert("End of Day Report Printed Successfully.");
+}
+
+</script>
+
+<div id="print-modal"
+     style="display:none;
+     position:fixed;
+     top:0;
+     left:0;
+     width:100%;
+     height:100%;
+     background:rgba(0,0,0,0.6);
+     z-index:9999;
+     align-items:center;
+     justify-content:center;">
+
 
     if (endOfDayOrders.length === 0) {
         alert("No completed sales to print.");
