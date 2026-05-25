@@ -944,10 +944,11 @@ function showModal(callback) {
     };
 }
 
-        const tableOrders = {
-            'T1': [], 'T2': [], 'T3': [], 'T4': [], 'T5': [],
-            'T6': [], 'T7': [], 'T8': [], 'T9': [], 'T10': []
-        };
+        const tableOrders =
+    JSON.parse(localStorage.getItem("tableOrders")) || {
+        'T1': [], 'T2': [], 'T3': [], 'T4': [], 'T5': [],
+        'T6': [], 'T7': [], 'T8': [], 'T9': [], 'T10': []
+    };
 
 const tableOrderNumbers = {};
 
@@ -1139,32 +1140,6 @@ function generateOrderNumber(tableId) {
 
     commands.push("\n\n\n");
 
-commands.push("--------------------------------\n");
-
-commands.push(
-    ESC_CENTER,
-    ESC_BOLD_ON,
-    "PAYMENT CONFIRMED\n",
-    ESC_BOLD_OFF
-);
-
-commands.push("--------------------------------\n");
-
-commands.push(
-    ESC_BOLD_ON,
-    `ORDER NO:\n${tableOrderNumbers[currentTable]}\n`,
-    ESC_BOLD_OFF
-);
-
-commands.push(`TABLE: ${currentTable}\n`);
-commands.push(`WAITER: ${staffName}\n`);
-
-commands.push("\nPAID ✔\n");
-
-commands.push("--------------------------------\n");
-
-commands.push("\n\n");
-
     commands.push(ESC_FEED_AND_CUT);
 
     await sendRawToUsbPrinter(commands);
@@ -1317,6 +1292,11 @@ commands.push(`Order No: ${tableOrderNumbers[currentTable]}\n`);
             date: `${dateStr} ${timestamp}`
         });
 
+localStorage.setItem(
+    "endOfDayOrders",
+    JSON.stringify(endOfDayOrders)
+);
+
     });
 
     commands.push(ESC_BOLD_ON);
@@ -1324,6 +1304,32 @@ commands.push(`Order No: ${tableOrderNumbers[currentTable]}\n`);
     commands.push(ESC_BOLD_OFF);
 
     commands.push("\n\n\n");
+
+commands.push("--------------------------------\n");
+
+commands.push(
+    ESC_CENTER,
+    ESC_BOLD_ON,
+    "PAYMENT CONFIRMED\n",
+    ESC_BOLD_OFF
+);
+
+commands.push("--------------------------------\n");
+
+commands.push(
+    ESC_BOLD_ON,
+    `ORDER NO:\n${tableOrderNumbers[currentTable]}\n`,
+    ESC_BOLD_OFF
+);
+
+commands.push(`TABLE: ${currentTable}\n`);
+commands.push(`WAITER: ${staffName}\n`);
+
+commands.push("\nPAID ✔\n");
+
+commands.push("--------------------------------\n");
+
+commands.push("\n\n");
 
     commands.push(ESC_FEED_AND_CUT);
 
@@ -1468,7 +1474,14 @@ if (!tableOrderNumbers[currentTable]) {
             if (existingItem) {
                 existingItem.qty += 1;
             } else {
-                activeOrderArray.push({ name: name, price: price, qty: 1, category: catType });
+                activeOrderArray.push({
+    name: name,
+    price: price,
+    qty: 1,
+    category: catType
+});
+
+localStorage.setItem("tableOrders", JSON.stringify(tableOrders));
             }
             
             updateReceiptDisplay();
@@ -1492,10 +1505,22 @@ if (!tableOrderNumbers[currentTable]) {
             if (!item) return;
 
             item.qty += amount;
+
+localStorage.setItem(
+    "tableOrders",
+    JSON.stringify(tableOrders)
+);
+
             if (item.qty <= 0) {
-                tableOrders[currentTable] = activeOrderArray.filter(i => i.name !== name);
-            }
-            
+    tableOrders[currentTable] =
+        activeOrderArray.filter(i => i.name !== name);
+}
+
+localStorage.setItem(
+    "tableOrders",
+    JSON.stringify(tableOrders)
+);
+          
             updateReceiptDisplay();
             updateTableIndicators();
         }
