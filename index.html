@@ -1215,13 +1215,13 @@ function generateOrderNumber(tableId) {
     commands.push(ESC_INIT);
 
     commands.push(
-        ESC_CENTER,
-        ESC_BOLD_ON,
-        "CASA LAKE VIEW RESORT\n",
-        "KITCHEN ORDER\n",
-commands.push(`ORDER #: ${tableOrderNumbers[currentTable]}\n`);
-        ESC_BOLD_OFF
-    );
+    ESC_CENTER,
+    ESC_BOLD_ON,
+    "CASA LAKE VIEW RESORT\n",
+    "KITCHEN ORDER\n",
+    `ORDER #: ${tableOrderNumbers[currentTable]}\n`,
+    ESC_BOLD_OFF
+);
 
     commands.push("--------------------------------\n");
 
