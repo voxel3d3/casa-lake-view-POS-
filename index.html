@@ -887,13 +887,23 @@
         </div>
 
         <div class="action-btns">
-            <button class="btn btn-kitchen" onclick="openKitchenPreview()">
-                🖨️ Kitchen Print
-            </button>
-            <button class="btn btn-payment" onclick="openPaymentPreview()">
-                💵 Payment Print
-            </button>
-        </div>
+
+    <button class="btn btn-kitchen" onclick="openKitchenPreview()">
+        🖨️ Kitchen Print
+    </button>
+
+    <button class="btn"
+        style="background:#3498db;"
+        onclick="openPendingBillPreview()">
+
+        📄 Pending Bill
+    </button>
+
+    <button class="btn btn-payment" onclick="openPaymentPreview()">
+        💵 Payment Print
+    </button>
+
+</div>
 
         <div class="order-header">
             <span>Current Order Items</span>
@@ -920,6 +930,10 @@ function openPaymentPreview() {
     showModal((name, method) => printPaymentBill(name, method));
 }
 
+function openPendingBillPreview() {
+    showModal((name, method) => printPendingBill(name, method));
+}
+
 function showModal(callback) {
     document.getElementById('print-modal').style.display = 'flex';
     document.getElementById('final-print-btn').onclick = function() {
@@ -934,6 +948,9 @@ function showModal(callback) {
             'T1': [], 'T2': [], 'T3': [], 'T4': [], 'T5': [],
             'T6': [], 'T7': [], 'T8': [], 'T9': [], 'T10': []
         };
+
+const tableOrderNumbers = {};
+
         // Stores completed paid orders
 let endOfDayOrders = [];
         let totalTablesCount = 10; 
@@ -964,6 +981,18 @@ let endOfDayOrders = [];
                 }
             });
         }
+
+function generateOrderNumber(tableId) {
+
+    const now = new Date();
+
+    const hours = now.getHours().toString().padStart(2, '0');
+    const mins = now.getMinutes().toString().padStart(2, '0');
+    const secs = now.getSeconds().toString().padStart(2, '0');
+
+    return `ORD-${tableId}-${hours}${mins}${secs}`;
+
+}
 
         window.onload = function() {
             rebuildSearchIndex();
@@ -1110,10 +1139,114 @@ let endOfDayOrders = [];
 
     commands.push("\n\n\n");
 
+commands.push("--------------------------------\n");
+
+commands.push(
+    ESC_CENTER,
+    ESC_BOLD_ON,
+    "PAYMENT CONFIRMED\n",
+    ESC_BOLD_OFF
+);
+
+commands.push("--------------------------------\n");
+
+commands.push(
+    ESC_BOLD_ON,
+    `ORDER NO:\n${tableOrderNumbers[currentTable]}\n`,
+    ESC_BOLD_OFF
+);
+
+commands.push(`TABLE: ${currentTable}\n`);
+commands.push(`WAITER: ${staffName}\n`);
+
+commands.push("\nPAID ✔\n");
+
+commands.push("--------------------------------\n");
+
+commands.push("\n\n");
+
     commands.push(ESC_FEED_AND_CUT);
 
     await sendRawToUsbPrinter(commands);
 }
+
+async function printPendingBill(staffName, method) {
+
+    const activeOrderArray = tableOrders[currentTable];
+
+    if (!activeOrderArray || activeOrderArray.length === 0) {
+        alert("There are no items on this table.");
+        return;
+    }
+
+    const dateStr = new Date().toLocaleDateString();
+
+    const timestamp = new Date().toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+
+    let totalBill = 0;
+
+    let commands = [];
+
+    commands.push(ESC_INIT);
+
+    commands.push(
+        ESC_CENTER,
+        ESC_BOLD_ON,
+        "CASA LAKE VIEW RESORT\n",
+        "PROFORMA INVOICE\n",
+        ESC_BOLD_OFF
+    );
+
+    commands.push("--------------------------------\n");
+
+    commands.push(`Table: ${currentTable}\n`);
+commands.push(`Order No: ${tableOrderNumbers[currentTable]}\n`);
+    commands.push(`Waiter: ${staffName}\n`);
+    commands.push(`Date: ${dateStr} ${timestamp}\n`);
+
+    commands.push("--------------------------------\n");
+
+    commands.push(ESC_LEFT);
+
+    activeOrderArray.forEach(item => {
+
+        const itemTotal = item.price * item.qty;
+
+        totalBill += itemTotal;
+
+        commands.push(`${item.name}\n`);
+
+        commands.push(
+            `${item.qty} x ${item.price.toFixed(2)} = GHS ${itemTotal.toFixed(2)}\n`
+        );
+
+        commands.push("--------------------------------\n");
+
+    });
+
+    commands.push(ESC_BOLD_ON);
+
+    commands.push(`TOTAL: GHS ${totalBill.toFixed(2)}\n`);
+
+    commands.push(ESC_BOLD_OFF);
+
+    commands.push("\n");
+
+    commands.push("PAYMENT NOT YET COMPLETED\n");
+
+    commands.push("\n\n\n");
+
+    commands.push(ESC_FEED_AND_CUT);
+
+    await sendRawToUsbPrinter(commands);
+
+    alert("Pending bill printed successfully.");
+
+}
+
       async function printPaymentBill(staffName, method) {
 
     const activeOrderArray = tableOrders[currentTable];
@@ -1147,6 +1280,8 @@ let endOfDayOrders = [];
     commands.push("--------------------------------\n");
 
     commands.push(`Table: ${currentTable}\n`);
+commands.push(`Order No: ${tableOrderNumbers[currentTable]}\n`);
+commands.push(`Order No: ${tableOrderNumbers[currentTable]}\n`);
     commands.push(`Waiter: ${staffName}\n`);
     commands.push(`Payment: ${method}\n`);
     commands.push(`Date: ${dateStr} ${timestamp}\n`);
@@ -1196,7 +1331,7 @@ let endOfDayOrders = [];
 
     // CLEAR CURRENT TABLE AFTER PAYMENT
     tableOrders[currentTable] = [];
-
+delete tableOrderNumbers[currentTable];
     updateReceiptDisplay();
     updateTableIndicators();
 
@@ -1319,6 +1454,11 @@ let endOfDayOrders = [];
 
         function addToOrder(name, price) {
             const activeOrderArray = tableOrders[currentTable];
+
+if (!tableOrderNumbers[currentTable]) {
+    tableOrderNumbers[currentTable] = generateOrderNumber(currentTable);
+}
+
             const existingItem = activeOrderArray.find(item => item.name === name);
             
             let catType = 'food';
@@ -1603,91 +1743,6 @@ if ("serviceWorker" in navigator) {
      align-items:center;
      justify-content:center;">
 
-
-    if (endOfDayOrders.length === 0) {
-        alert("No completed sales to print.");
-        return;
-    }
-
-    let commands = [];
-
-    commands.push(ESC_INIT);
-
-    commands.push(
-        ESC_CENTER,
-        ESC_BOLD_ON,
-        "CASA LAKE VIEW RESORT\n",
-        "END OF DAY REPORT\n",
-        ESC_BOLD_OFF
-    );
-
-    commands.push("--------------------------------\n");
-
-    let foodTotal = 0;
-    let drinkTotal = 0;
-
-    commands.push("FOOD SALES\n");
-    commands.push("--------------------------------\n");
-
-    endOfDayOrders
-        .filter(order => order.category === 'food')
-        .forEach(order => {
-
-            commands.push(`${order.item}\n`);
-
-            commands.push(
-                `${order.qty} x GHS ${order.price.toFixed(2)} = GHS ${order.total.toFixed(2)}\n`
-            );
-
-            commands.push(
-                `Pay: ${order.paymentMethod} | Waiter: ${order.waiter}\n`
-            );
-
-            commands.push("--------------------------------\n");
-
-            foodTotal += order.total;
-        });
-
-    commands.push("\nDRINK SALES\n");
-    commands.push("--------------------------------\n");
-
-    endOfDayOrders
-        .filter(order => order.category === 'drink')
-        .forEach(order => {
-
-            commands.push(`${order.item}\n`);
-
-            commands.push(
-                `${order.qty} x GHS ${order.price.toFixed(2)} = GHS ${order.total.toFixed(2)}\n`
-            );
-
-            commands.push(
-                `Pay: ${order.paymentMethod} | Waiter: ${order.waiter}\n`
-            );
-
-            commands.push("--------------------------------\n");
-
-            drinkTotal += order.total;
-        });
-
-    const grandTotal = foodTotal + drinkTotal;
-
-    commands.push(ESC_BOLD_ON);
-
-    commands.push(`FOOD TOTAL: GHS ${foodTotal.toFixed(2)}\n`);
-    commands.push(`DRINK TOTAL: GHS ${drinkTotal.toFixed(2)}\n`);
-    commands.push(`GRAND TOTAL: GHS ${grandTotal.toFixed(2)}\n`);
-
-    commands.push(ESC_BOLD_OFF);
-
-    commands.push("\n\n\n");
-
-    commands.push(ESC_FEED_AND_CUT);
-
-    await sendRawToUsbPrinter(commands);
-
-    alert("End of Day Report Printed Successfully.");
-} background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
     <div style="background:white; padding:20px; border-radius:10px; width:280px; text-align:center;">
         <h3>Bill Details</h3>
         <input type="text" id="staff-name-input" placeholder="Waiter Name" style="width:90%; padding:8px; margin:10px 0;">
