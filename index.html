@@ -1005,6 +1005,35 @@ function loginUser() {
     }
 }
 
+function resetSystem() {
+
+    const confirmReset = confirm(
+        "Are you sure you want to clear all orders and reports?"
+    );
+
+    if (!confirmReset) return;
+
+    Object.keys(tableOrders).forEach(table => {
+        tableOrders[table] = [];
+    });
+
+    endOfDayOrders = [];
+
+    Object.keys(tableOrderNumbers).forEach(table => {
+        delete tableOrderNumbers[table];
+    });
+
+    localStorage.removeItem("tableOrders");
+    localStorage.removeItem("endOfDayOrders");
+    localStorage.removeItem("tableOrderNumbers");
+
+    updateReceiptDisplay();
+    updateTableIndicators();
+    generateEndOfDayReport();
+
+    alert("System reset successfully.");
+}
+
 function openPaymentPreview() {
     showModal((name, method) => printPaymentBill(name, method));
 }
@@ -1836,6 +1865,19 @@ if ("serviceWorker" in navigator) {
     .catch(err => console.log("SW failed", err));
 }
 </script>
+
+<button onclick="resetSystem()"
+style="
+padding:10px;
+background:#e74c3c;
+color:white;
+border:none;
+cursor:pointer;
+margin-top:10px;
+width:100%;
+">
+Reset Day
+</button>
 
 <div id="print-modal"
      style="display:none;
