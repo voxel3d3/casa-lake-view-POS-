@@ -373,7 +373,65 @@
         }
     </style>
 </head>
-<body>
+
+<body style="display:none;" id="main-body">
+
+<div id="login-screen"
+     style="
+        position:fixed;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        background:#f4f4f4;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        z-index:99999;
+">
+
+    <div style="
+        background:white;
+        padding:30px;
+        border-radius:10px;
+        width:300px;
+        box-shadow:0 0 10px rgba(0,0,0,0.2);
+        text-align:center;
+    ">
+
+        <h2>POS LOGIN</h2>
+
+        <input
+            type="text"
+            id="username"
+            placeholder="Username"
+            style="width:100%; padding:10px; margin-bottom:10px;"
+        >
+
+        <input
+            type="password"
+            id="password"
+            placeholder="Password"
+            style="width:100%; padding:10px; margin-bottom:15px;"
+        >
+
+        <button
+            onclick="loginUser()"
+            style="
+                width:100%;
+                padding:10px;
+                background:#27ae60;
+                color:white;
+                border:none;
+                cursor:pointer;
+            "
+        >
+            LOGIN
+        </button>
+
+    </div>
+
+</div>
 
     <div class="menu-container">
         <div class="resort-header">CASA LAKE VIEW RESORT</div>
@@ -913,6 +971,8 @@
         <div class="receipt-items" id="receipt-items-container">
             </div>
 
+<div id="pos-system" style="display:none;">
+
         <div class="checkout-section">
             <div class="total-row">
                 <span>Total:</span>
@@ -924,6 +984,27 @@
     <script>// --- THE BRIDGE: Connects the popup to your printer ---
 function openKitchenPreview() {
     showModal((name, method) => printKitchenOrder(name, method));
+}
+
+function loginUser() {
+
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    const correctUsername = "admin";
+    const correctPassword = "1234";
+
+    if (username === correctUsername && password === correctPassword) {
+
+        document.getElementById("login-screen").style.display = "none";
+
+        document.getElementById("pos-system").style.display = "block";
+
+    } else {
+
+        alert("Wrong Username or Password");
+
+    }
 }
 
 function openPaymentPreview() {
@@ -953,7 +1034,9 @@ function showModal(callback) {
 const tableOrderNumbers = {};
 
         // Stores completed paid orders
-let endOfDayOrders = [];
+
+let endOfDayOrders = JSON.parse(localStorage.getItem("endOfDayOrders")) || [];
+
         let totalTablesCount = 10; 
         let currentTable = 'T1';
         let currentMainMode = 'foods';
@@ -1792,5 +1875,8 @@ if ("serviceWorker" in navigator) {
     </button>
     <div id="report-container" style="margin-top: 20px;"></div>
 </div>
+
+</div>
+
 </body>
 </html>
