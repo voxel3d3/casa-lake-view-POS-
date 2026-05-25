@@ -1212,6 +1212,19 @@ function generateOrderNumber(tableId) {
 
     let commands = [];
 
+// GET ORDER NUMBER FOR THIS TABLE
+let orderNumber = tableOrderNumbers[currentTable];
+
+if (!orderNumber) {
+    orderNumber = "ORD-" + Math.floor(1000 + Math.random() * 9000);
+    tableOrderNumbers[currentTable] = orderNumber;
+
+    localStorage.setItem(
+        "tableOrderNumbers",
+        JSON.stringify(tableOrderNumbers)
+    );
+}
+
     commands.push(ESC_INIT);
 
     commands.push(
@@ -1219,7 +1232,7 @@ function generateOrderNumber(tableId) {
     ESC_BOLD_ON,
     "CASA LAKE VIEW RESORT\n",
     "KITCHEN ORDER\n",
-    `ORDER #: ${tableOrderNumbers[currentTable]}\n`,
+    `ORDER #: ${orderNumber}\n`,
     ESC_BOLD_OFF
 );
 
