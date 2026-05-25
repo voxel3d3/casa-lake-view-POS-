@@ -1219,6 +1219,7 @@ function generateOrderNumber(tableId) {
         ESC_BOLD_ON,
         "CASA LAKE VIEW RESORT\n",
         "KITCHEN ORDER\n",
+commands.push(`ORDER #: ${tableOrderNumbers[currentTable]}\n`);
         ESC_BOLD_OFF
     );
 
