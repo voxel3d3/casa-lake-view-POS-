@@ -1033,7 +1033,7 @@ const staffAccounts = [
 window.addEventListener("load", () => {
 
     const savedLoginStaff =
-        localStorage.getItem("currentLoggedInStaff");
+    sessionStorage.getItem("currentLoggedInStaff");
 
     if (savedLoginStaff) {
 
@@ -1063,10 +1063,10 @@ function loginUser() {
 
         currentLoggedInStaff = foundUser.fullName;
 
-        localStorage.setItem(
-            "currentLoggedInStaff",
-            currentLoggedInStaff
-        );
+        sessionStorage.setItem(
+    "currentLoggedInStaff",
+    currentLoggedInStaff
+);
 
         document.getElementById("login-screen").style.display = "none";
 
@@ -1118,6 +1118,8 @@ function resetSystem() {
     localStorage.removeItem("tableOrders");
     localStorage.removeItem("endOfDayOrders");
     localStorage.removeItem("tableOrderNumbers");
+
+sessionStorage.removeItem("currentLoggedInStaff");
 
     updateReceiptDisplay();
     updateTableIndicators();
@@ -1999,4 +2001,12 @@ Reset Day
 </div>
 
       
-    <div id="report-section" style="margin-top: 40px; padding: 20px; border-top: 2px solid #ddd; bac
+    <div id="report-section" style="margin-top: 40px; padding: 20px; border-top: 2px solid #ddd; background: #f9f9f9;">
+    <h3>End of Day Sales Report</h3>
+    <button onclick="generateEndOfDayReport()" style="padding:10px 20px; background:#3498db; color:white; border:none; cursor:pointer; border-radius:5px;">
+        Generate Report
+    </button>
+    <div id="report-container" style="margin-top: 20px;"></div>
+</div>
+</body>
+</html>
