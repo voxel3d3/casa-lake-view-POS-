@@ -1572,17 +1572,20 @@ commands.push(ESC_FEED_AND_CUT);
 await sendRawToUsbPrinter(commands);
 
 alert("Payment bill printed successfully.");
-}
 
-    // CLEAR CURRENT TABLE AFTER PAYMENT
-    tableOrders[currentTable] = [];
+// CLEAR CURRENT TABLE AFTER PAYMENT
+tableOrders[currentTable] = [];
+
 delete tableOrderNumbers[currentTable];
-    updateReceiptDisplay();
-    updateTableIndicators();
 
-    generateEndOfDayReport();
+updateReceiptDisplay();
 
-    alert("Payment completed and moved to End of Day Report.");
+updateTableIndicators();
+
+generateEndOfDayReport();
+
+alert("Payment completed and moved to End of Day Report.");
+
 }
 
 
