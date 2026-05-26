@@ -1141,23 +1141,6 @@ let endOfDayOrders = JSON.parse(localStorage.getItem("endOfDayOrders")) || [];
         let totalTablesCount = 10; 
         let currentTable = 'T1';
 
-let currentLoggedInStaff = "";
-
-const savedLoginStaff =
-    localStorage.getItem("currentLoggedInStaff");
-
-if (savedLoginStaff) {
-
-    currentLoggedInStaff = savedLoginStaff;
-
-    window.addEventListener("load", () => {
-
-        document.getElementById("login-screen").style.display = "none";
-
-
-    });
-}
-
         let currentMainMode = 'foods';
         let currentFoodSubTab = 'breakfast';
         let currentDrinkSubTab = 'soft-drinks';
@@ -2016,12 +1999,4 @@ Reset Day
 </div>
 
       
-    <div id="report-section" style="margin-top: 40px; padding: 20px; border-top: 2px solid #ddd; background: #f9f9f9;">
-    <h3>End of Day Sales Report</h3>
-    <button onclick="generateEndOfDayReport()" style="padding:10px 20px; background:#3498db; color:white; border:none; cursor:pointer; border-radius:5px;">
-        Generate Report
-    </button>
-    <div id="report-container" style="margin-top: 20px;"></div>
-</div>
-</body>
-</html>
+    <div id="report-section" style="margin-top: 40px; padding: 20px; border-top: 2px solid #ddd; bac
