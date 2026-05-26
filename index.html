@@ -1276,6 +1276,11 @@ function generateOrderNumber(tableId) {
     const activeOrderArray = tableOrders[currentTable];
     const foodItems = activeOrderArray.filter(item => item.category === 'food');
 
+const orderCreatedBy =
+    foodItems.length > 0
+        ? foodItems[0].createdBy
+        : "Unknown";
+
     if (foodItems.length === 0) {
         alert("There are no food items on this table to send to the kitchen.");
         return;
@@ -1317,7 +1322,10 @@ if (!orderNumber) {
 
     commands.push(`Table: ${currentTable}\n`);
     commands.push(`Waiter: ${waiterName}\n`);
-commands.push(`POS Staff: ${operatorName}\n`);
+
+commands.push(`Order By: ${orderCreatedBy}\n`);
+commands.push(`Printed By: ${operatorName}\n`);
+
     commands.push(`Payment: ${method}\n`);
     commands.push(`Date: ${dateStr} ${timestamp}\n`);
 
@@ -1351,6 +1359,11 @@ async function printPendingBill(waiterName, method, operatorName) {
 
     const activeOrderArray = tableOrders[currentTable];
 
+const orderCreatedBy =
+    activeOrderArray.length > 0
+        ? activeOrderArray[0].createdBy
+        : "Unknown";
+
     if (!activeOrderArray || activeOrderArray.length === 0) {
         alert("There are no items on this table.");
         return;
@@ -1382,8 +1395,8 @@ async function printPendingBill(waiterName, method, operatorName) {
     commands.push(`Table: ${currentTable}\n`);
 commands.push(`Order No: ${tableOrderNumbers[currentTable]}\n`);
     commands.push(`Waiter: ${waiterName}\n`);
-commands.push(`POS Staff: ${operatorName}\n`);
-    commands.push(`Date: ${dateStr} ${timestamp}\n`);
+commands.push(`POS Staff: ${operatorName} commands.push(`Order By: ${orderCreatedBy}\n`);
+commands.push(`Printed By: ${operatorName}\n`); mmands.push(`Date: ${dateStr} ${timestamp}\n`);
 
     commands.push("--------------------------------\n");
 
@@ -1429,6 +1442,11 @@ commands.push(`POS Staff: ${operatorName}\n`);
 
     const activeOrderArray = tableOrders[currentTable];
 
+const orderCreatedBy =
+    activeOrderArray.length > 0
+        ? activeOrderArray[0].createdBy
+        : "Unknown";
+
     if (!activeOrderArray || activeOrderArray.length === 0) {
         alert("There are no items on this table.");
         return;
@@ -1460,7 +1478,10 @@ commands.push(`POS Staff: ${operatorName}\n`);
 commands.push(`Table: ${currentTable}\n`);
 commands.push(`Order No: ${tableOrderNumbers[currentTable]}\n`);
 commands.push(`WAITER: ${waiterName}\n`);
-commands.push(`POS Staff: ${operatorName}\n`);
+
+commands.push(`Order By: ${orderCreatedBy}\n`);
+commands.push(`Printed By: ${operatorName}\n`);
+
 commands.push(`Payment: ${method}\n`);
 commands.push(`Date: ${dateStr} ${timestamp}\n`);
 
