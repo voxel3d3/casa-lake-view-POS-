@@ -1193,6 +1193,9 @@ function generateOrderNumber(tableId) {
 
         window.addEventListener("load", () => {
 
+sessionStorage.removeItem("currentLoggedInStaff");
+document.getElementById("login-screen").style.display = "flex";
+
     rebuildSearchIndex();
     updateReceiptDisplay();
     updateTableIndicators();
@@ -1708,7 +1711,7 @@ alert("Payment completed and moved to End of Day Report.");
             document.getElementById(subTabId).classList.add('active');
         }
 
-        function addToOrder(name, price) {
+       function addToOrder(name, price) {
 
     const activeOrderArray = tableOrders[currentTable];
 
@@ -1754,17 +1757,17 @@ alert("Payment completed and moved to End of Day Report.");
     }
 
     // SAVE TO LOCAL STORAGE
-   
+    localStorage.setItem(
+        "tableOrders",
+        JSON.stringify(tableOrders)
+    );
 
     // REFRESH SCREEN
-
-localStorage.setItem(
-    "tableOrders",
-    JSON.stringify(tableOrders)
-);
-
     updateReceiptDisplay();
+    updateTableIndicators();
+}
 
+/* THIS FUNCTION MUST BE OUTSIDE addToOrder */
 function changeQty(itemName, change) {
 
     const activeOrderArray = tableOrders[currentTable];
@@ -1793,7 +1796,6 @@ function changeQty(itemName, change) {
     );
 
     updateReceiptDisplay();
-
     updateTableIndicators();
 }
 
