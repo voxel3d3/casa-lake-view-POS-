@@ -1029,20 +1029,6 @@ const staffAccounts = [
     }
 ];
 
-// AUTO LOGIN IF SAVED
-window.addEventListener("load", () => {
-
-    const savedLoginStaff =
-    sessionStorage.getItem("currentLoggedInStaff");
-
-    if (savedLoginStaff) {
-
-        currentLoggedInStaff = savedLoginStaff;
-
-        document.getElementById("login-screen").style.display = "none";
-    }
-});
-
 // LOGIN FUNCTION
 function loginUser() {
 
@@ -1061,22 +1047,23 @@ function loginUser() {
 
     if (foundUser) {
 
-        currentLoggedInStaff = foundUser.fullName;
+    currentLoggedInStaff = foundUser.fullName;
 
-        sessionStorage.setItem(
-    "currentLoggedInStaff",
-    currentLoggedInStaff
-);
+    sessionStorage.setItem(
+        "currentLoggedInStaff",
+        currentLoggedInStaff
+    );
 
-        document.getElementById("login-screen").style.display = "none";
+    document.getElementById("login-screen").style.display = "none";
 
-        alert("Welcome " + currentLoggedInStaff);
+    document.body.style.overflow = "auto";
 
-    } else {
+    alert("Welcome " + currentLoggedInStaff);
 
-        alert("Wrong Username or Password");
+} else {
 
-    }
+    alert("Wrong Username or Password");
+
 }
 
 function showModal(callback) {
@@ -1182,11 +1169,22 @@ function generateOrderNumber(tableId) {
 
 }
 
-        window.onload = function() {
-            rebuildSearchIndex();
-            updateReceiptDisplay();
-            updateTableIndicators();
-        };
+        window.addEventListener("load", () => {
+
+    rebuildSearchIndex();
+    updateReceiptDisplay();
+    updateTableIndicators();
+
+    const savedLoginStaff =
+        sessionStorage.getItem("currentLoggedInStaff");
+
+    if (savedLoginStaff) {
+
+        currentLoggedInStaff = savedLoginStaff;
+
+        document.getElementById("login-screen").style.display = "none";
+    }
+});
 
         async function getUsbPrinterConnection() {
             if (usbDevice && usbDevice.opened) {
