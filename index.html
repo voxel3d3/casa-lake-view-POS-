@@ -457,6 +457,8 @@
             <button class="sub-tab-btn" onclick="switchFoodSubTab('combos')">Combos Menu</button>
         </div>
 
+<button class="sub-tab-btn" onclick="switchFoodSubTab('kids-meal')">Kids Meal</button>
+
         <div id="drink-sub-tabs" class="sub-tab-bar" style="display: none;">
             <button class="sub-tab-btn active" onclick="switchDrinkSubTab('soft-drinks')">Soft Drinks</button>
             <button class="sub-tab-btn" onclick="switchDrinkSubTab('energy-beer')">Energy & Beer</button>
@@ -670,6 +672,20 @@
                     <span class="item-price">GHS 100</span>
                 </div>
             </div>
+
+<div id="kids-meal" class="grid-container food-grid">
+
+    <div class="item-card" data-category="food" onclick="addToOrder('Jollof Rice for Kids', 50)">
+        <span class="item-name">Jollof Rice for Kids</span>
+        <span class="item-price">GHS 50</span>
+    </div>
+
+    <div class="item-card" data-category="food" onclick="addToOrder('Fried Rice for Kids', 50)">
+        <span class="item-name">Fried Rice for Kids</span>
+        <span class="item-price">GHS 50</span>
+    </div>
+
+</div>
 
             <div id="soft-drinks" class="grid-container drink-grid">
                 <div class="item-card" data-category="drink" onclick="addToOrder('Bottle Water', 10)">
