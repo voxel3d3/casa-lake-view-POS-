@@ -984,25 +984,102 @@ function openKitchenPreview() {
     showModal((name, method) => printKitchenOrder(name, method));
 }
 
-function loginUser() {
+let currentLoggedInStaff = "";
 
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
+const savedLoginStaff =
+    localStorage.getItem("currentLoggedInStaff");
 
-    const correctUsername = "admin";
-    const correctPassword = "1234";
+if (savedLoginStaff) {
 
-    if (username === correctUsername && password === correctPassword) {
+    currentLoggedInStaff = savedLoginStaff;
+
+    window.addEventListener("load", () => {
 
         document.getElementById("login-screen").style.display = "none";
 
-        document.getElementById("pos-system").style.display = "block";
+    });
+}
+
+// POS STAFF ACCOUNTS
+const staffAccounts = [
+
+    {
+        username: "ben",
+        password: "1234",
+        fullName: "Ben"
+    },
+
+    {
+        username: "kingsford",
+        password: "1234",
+        fullName: "Kingsford"
+    },
+
+    {
+        username: "williams",
+        password: "1234",
+        fullName: "Williams"
+    },
+
+    {
+        username: "kingpin",
+        password: "1234",
+        fullName: "Kingpin"
+    }
+
+];
+
+// LOGIN FUNCTION
+function loginUser() {
+
+    const username =
+        document.getElementById("username").value.trim();
+
+    const password =
+        document.getElementById("password").value.trim();
+
+    const foundUser = staffAccounts.find(user =>
+
+        user.username === username &&
+        user.password === password
+
+    );
+
+    if (foundUser) {
+
+        currentLoggedInStaff = foundUser.fullName;
+
+        localStorage.setItem(
+            "currentLoggedInStaff",
+            currentLoggedInStaff
+        );
+
+        document.getElementById("login-screen").style.display = "none";
+
+        alert("Welcome " + currentLoggedInStaff);
 
     } else {
 
         alert("Wrong Username or Password");
 
     }
+}
+
+const savedLoginStaff =
+    localStorage.getItem("currentLoggedInStaff");
+
+if (savedLoginStaff) {
+
+    currentLoggedInStaff = savedLoginStaff;
+
+    window.addEventListener("load", () => {
+
+    document.getElementById("login-screen").style.display = "none";
+
+    document.getElementById("pos-system").style.display = "block";
+
+});
+
 }
 
 function resetSystem() {
@@ -1066,6 +1143,25 @@ let endOfDayOrders = JSON.parse(localStorage.getItem("endOfDayOrders")) || [];
 
         let totalTablesCount = 10; 
         let currentTable = 'T1';
+
+let currentLoggedInStaff = "";
+
+const savedLoginStaff =
+    localStorage.getItem("currentLoggedInStaff");
+
+if (savedLoginStaff) {
+
+    currentLoggedInStaff = savedLoginStaff;
+
+    window.addEventListener("load", () => {
+
+        document.getElementById("login-screen").style.display = "none";
+
+        document.getElementById("pos-system").style.display = "block";
+
+    });
+}
+
         let currentMainMode = 'foods';
         let currentFoodSubTab = 'breakfast';
         let currentDrinkSubTab = 'soft-drinks';
@@ -1194,7 +1290,7 @@ function generateOrderNumber(tableId) {
         const ESC_FEED_AND_CUT = [0x1D, 0x56, 0x42, 0x03];
 
         // UPDATED: Kitchen ticket layout including Date and individual/total Pricing
-        async function printKitchenOrder(staffName, method) {
+        async function printKitchenOrder(waiterName, method, operatorName) {
 
     const activeOrderArray = tableOrders[currentTable];
     const foodItems = activeOrderArray.filter(item => item.category === 'food');
@@ -1239,7 +1335,8 @@ if (!orderNumber) {
     commands.push("--------------------------------\n");
 
     commands.push(`Table: ${currentTable}\n`);
-    commands.push(`Staff: ${staffName}\n`);
+    commands.push(`Waiter: ${waiterName}\n`);
+commands.push(`POS Staff: ${operatorName}\n`);
     commands.push(`Payment: ${method}\n`);
     commands.push(`Date: ${dateStr} ${timestamp}\n`);
 
@@ -1269,7 +1366,7 @@ if (!orderNumber) {
     await sendRawToUsbPrinter(commands);
 }
 
-async function printPendingBill(staffName, method) {
+async function printPendingBill(waiterName, method, operatorName) {
 
     const activeOrderArray = tableOrders[currentTable];
 
@@ -1304,6 +1401,7 @@ async function printPendingBill(staffName, method) {
     commands.push(`Table: ${currentTable}\n`);
 commands.push(`Order No: ${tableOrderNumbers[currentTable]}\n`);
     commands.push(`Waiter: ${staffName}\n`);
+commands.push(`POS Staff: ${operatorName}\n`);
     commands.push(`Date: ${dateStr} ${timestamp}\n`);
 
     commands.push("--------------------------------\n");
@@ -1346,7 +1444,7 @@ commands.push(`Order No: ${tableOrderNumbers[currentTable]}\n`);
 
 }
 
-      async function printPaymentBill(staffName, method) {
+      async function printPaymentBill(waiterName, method, operatorName) {
 
     const activeOrderArray = tableOrders[currentTable];
 
@@ -1381,7 +1479,8 @@ commands.push(`Order No: ${tableOrderNumbers[currentTable]}\n`);
     commands.push(`Table: ${currentTable}\n`);
 commands.push(`Order No: ${tableOrderNumbers[currentTable]}\n`);
 commands.push(`Order No: ${tableOrderNumbers[currentTable]}\n`);
-    commands.push(`Waiter: ${staffName}\n`);
+commands.push(`Waiter: ${waiterName}\n`);
+commands.push(`POS Staff: ${operatorName}\n`);
     commands.push(`Payment: ${method}\n`);
     commands.push(`Date: ${dateStr} ${timestamp}\n`);
 
@@ -1405,16 +1504,22 @@ commands.push(`Order No: ${tableOrderNumbers[currentTable]}\n`);
 
         // SAVE INTO END OF DAY REPORT
         endOfDayOrders.push({
-            table: currentTable,
-            item: item.name,
-            category: item.category,
-            qty: item.qty,
-            price: item.price,
-            total: itemTotal,
-            paymentMethod: method,
-            waiter: staffName,
-            date: `${dateStr} ${timestamp}`
-        });
+
+    table: currentTable,
+    item: item.name,
+    category: item.category,
+    qty: item.qty,
+    price: item.price,
+    total: itemTotal,
+    paymentMethod: method,
+
+    waiter: waiterName,
+
+    operator: operatorName,
+
+    date: `${dateStr} ${timestamp}`
+
+});
 
 localStorage.setItem(
     "endOfDayOrders",
@@ -1583,71 +1688,60 @@ delete tableOrderNumbers[currentTable];
         }
 
         function addToOrder(name, price) {
-            const activeOrderArray = tableOrders[currentTable];
 
-if (!tableOrderNumbers[currentTable]) {
-    tableOrderNumbers[currentTable] = generateOrderNumber(currentTable);
-}
+    const activeOrderArray = tableOrders[currentTable];
 
-            const existingItem = activeOrderArray.find(item => item.name === name);
-            
-            let catType = 'food';
-            const mappedItem = allItemsList.find(i => i.name === name);
-            if(mappedItem) catType = mappedItem.category;
+    // CREATE ORDER NUMBER IF TABLE HAS NONE
+    if (!tableOrderNumbers[currentTable]) {
 
-            if (existingItem) {
-                existingItem.qty += 1;
-            } else {
-                activeOrderArray.push({
-    name: name,
-    price: price,
-    qty: 1,
-    category: catType
-});
+        tableOrderNumbers[currentTable] =
+            generateOrderNumber(currentTable);
+    }
 
-localStorage.setItem("tableOrders", JSON.stringify(tableOrders));
-            }
-            
-            updateReceiptDisplay();
-            updateTableIndicators();
-        }
+    // CHECK IF ITEM ALREADY EXISTS
+    const existingItem =
+        activeOrderArray.find(item => item.name === name);
 
-        document.querySelector('.menu-content-wrapper').addEventListener('click', function(e) {
-            const card = e.target.closest('.item-card');
-            if (card && document.getElementById('search-results-view').style.display === 'grid') {
-                const onclickStr = card.getAttribute('onclick');
-                const matches = onclickStr.match(/'([^']+)',\s*([0-9.]+)/);
-                if(matches) {
-                    addToOrder(matches[1], parseFloat(matches[2]));
-                }
-            }
+    let catType = 'food';
+
+    const mappedItem =
+        allItemsList.find(i => i.name === name);
+
+    if (mappedItem) {
+        catType = mappedItem.category;
+    }
+
+    // IF ITEM EXISTS, INCREASE QTY
+    if (existingItem) {
+
+        existingItem.qty += 1;
+
+    } else {
+
+        // ADD NEW ITEM
+        activeOrderArray.push({
+
+            name: name,
+            price: price,
+            qty: 1,
+            category: catType,
+
+            // PERSON WHO ENTERED ORDER
+            createdBy: currentLoggedInStaff
+
         });
+    }
 
-        function changeQty(name, amount) {
-            let activeOrderArray = tableOrders[currentTable];
-            const item = activeOrderArray.find(item => item.name === name);
-            if (!item) return;
+    // SAVE TO LOCAL STORAGE
+    localStorage.setItem(
+        "tableOrders",
+        JSON.stringify(tableOrders)
+    );
 
-            item.qty += amount;
-
-localStorage.setItem(
-    "tableOrders",
-    JSON.stringify(tableOrders)
-);
-
-            if (item.qty <= 0) {
-    tableOrders[currentTable] =
-        activeOrderArray.filter(i => i.name !== name);
+    // REFRESH SCREEN
+    updateReceiptDisplay();
+    updateTableIndicators();
 }
-
-localStorage.setItem(
-    "tableOrders",
-    JSON.stringify(tableOrders)
-);
-          
-            updateReceiptDisplay();
-            updateTableIndicators();
-        }
 
         function updateReceiptDisplay() {
             const container = document.getElementById('receipt-items-container');
@@ -1743,6 +1837,10 @@ localStorage.setItem(
             ${drinksHTML}
 
         </table>
+
+<th>POS Staff</th>
+
+<td>${order.operator}</td>
 
         <div style="margin-top:25px; font-size:22px; font-weight:bold; color:#1a3a5f;">
             GRAND TOTAL: GHS ${grandTotal.toFixed(2)}
