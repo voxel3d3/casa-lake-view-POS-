@@ -1516,23 +1516,21 @@ localStorage.setItem(
 
 commands.push("--------------------------------\n");
 
-commands.push(
-    ESC_CENTER,
-    ESC_BOLD_ON,
-    "PAYMENT CONFIRMED\n",
-    ESC_BOLD_OFF
-);
+commands.push(ESC_CENTER);
+
+commands.push(ESC_BOLD_ON);
+commands.push("PAYMENT CONFIRMED\n");
+commands.push(ESC_BOLD_OFF);
 
 commands.push("--------------------------------\n");
 
-commands.push(
-    ESC_BOLD_ON,
-    `ORDER NO:\n${tableOrderNumbers[currentTable]}\n`,
-    ESC_BOLD_OFF
-);
+commands.push(ESC_BOLD_ON);
+commands.push("ORDER NO:\n");
+commands.push(`${tableOrderNumbers[currentTable]}\n`);
+commands.push(ESC_BOLD_OFF);
 
 commands.push(`TABLE: ${currentTable}\n`);
-commands.push(`WAITER: ${staffName}\n`);
+commands.push(`WAITER: ${waiterName}\n`);
 
 commands.push("\nPAID ✔\n");
 
