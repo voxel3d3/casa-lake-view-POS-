@@ -712,6 +712,12 @@
                     <span class="item-name">Alvaro</span>
                     <span class="item-price">GHS 20</span>
                 </div>
+
+<div class="item-card" data-category="drink" onclick="addToOrder('Malt', 30)">
+    <span class="item-name">Malt</span>
+    <span class="item-price">GHS 30</span>
+</div>
+
                 <div class="item-card" data-category="drink" onclick="addToOrder('Frutelli', 80)">
                     <span class="item-name">Frutelli</span>
                     <span class="item-price">GHS 80</span>
@@ -1065,7 +1071,7 @@ function loginUser() {
     alert("Wrong Username or Password");
 
 }
-
+}
 function showModal(callback) {
 
     document.getElementById('print-modal').style.display = 'flex';
@@ -1841,10 +1847,6 @@ delete tableOrderNumbers[currentTable];
             ${drinksHTML}
 
         </table>
-
-<th>POS Staff</th>
-
-<td>${order.operator}</td>
 
         <div style="margin-top:25px; font-size:22px; font-weight:bold; color:#1a3a5f;">
             GRAND TOTAL: GHS ${grandTotal.toFixed(2)}
