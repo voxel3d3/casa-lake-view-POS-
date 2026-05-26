@@ -979,30 +979,31 @@
         </div>
     </div>
 
-    <script>// --- THE BRIDGE: Connects the popup to your printer ---
+    <script> // --- THE BRIDGE: Connects the popup to your printer ---
+
 function openKitchenPreview() {
-    showModal((name, method) => printKitchenOrder(name, method));
+    showModal((name, method) =>
+        printKitchenOrder(name, method, currentLoggedInStaff)
+    );
 }
 
+function openPaymentPreview() {
+    showModal((name, method) =>
+        printPaymentBill(name, method, currentLoggedInStaff)
+    );
+}
+
+function openPendingBillPreview() {
+    showModal((name, method) =>
+        printPendingBill(name, method, currentLoggedInStaff)
+    );
+}
+
+// CURRENT LOGGED IN STAFF
 let currentLoggedInStaff = "";
-
-const savedLoginStaff =
-    localStorage.getItem("currentLoggedInStaff");
-
-if (savedLoginStaff) {
-
-    currentLoggedInStaff = savedLoginStaff;
-
-    window.addEventListener("load", () => {
-
-        document.getElementById("login-screen").style.display = "none";
-
-    });
-}
 
 // POS STAFF ACCOUNTS
 const staffAccounts = [
-
     {
         username: "ben",
         password: "1234",
@@ -1026,8 +1027,21 @@ const staffAccounts = [
         password: "1234",
         fullName: "Kingpin"
     }
-
 ];
+
+// AUTO LOGIN IF SAVED
+window.addEventListener("load", () => {
+
+    const savedLoginStaff =
+        localStorage.getItem("currentLoggedInStaff");
+
+    if (savedLoginStaff) {
+
+        currentLoggedInStaff = savedLoginStaff;
+
+        document.getElementById("login-screen").style.display = "none";
+    }
+});
 
 // LOGIN FUNCTION
 function loginUser() {
@@ -1065,19 +1079,22 @@ function loginUser() {
     }
 }
 
-const savedLoginStaff =
-    localStorage.getItem("currentLoggedInStaff");
+function showModal(callback) {
 
-if (savedLoginStaff) {
+    document.getElementById('print-modal').style.display = 'flex';
 
-    currentLoggedInStaff = savedLoginStaff;
+    document.getElementById('final-print-btn').onclick = function() {
 
-    window.addEventListener("load", () => {
+        const name =
+            document.getElementById('staff-name-input').value;
 
-    document.getElementById("login-screen").style.display = "none";
+        const method =
+            document.getElementById('payment-method-select').value;
 
-});
+        document.getElementById('print-modal').style.display = 'none';
 
+        callback(name, method);
+    };
 }
 
 function resetSystem() {
@@ -1107,24 +1124,6 @@ function resetSystem() {
     generateEndOfDayReport();
 
     alert("System reset successfully.");
-}
-
-function openPaymentPreview() {
-    showModal((name, method) => printPaymentBill(name, method));
-}
-
-function openPendingBillPreview() {
-    showModal((name, method) => printPendingBill(name, method));
-}
-
-function showModal(callback) {
-    document.getElementById('print-modal').style.display = 'flex';
-    document.getElementById('final-print-btn').onclick = function() {
-        const name = document.getElementById('staff-name-input').value;
-        const method = document.getElementById('payment-method-select').value;
-        document.getElementById('print-modal').style.display = 'none';
-        callback(name, method);
-    };
 }
 
         const tableOrders =
@@ -1397,7 +1396,7 @@ async function printPendingBill(waiterName, method, operatorName) {
 
     commands.push(`Table: ${currentTable}\n`);
 commands.push(`Order No: ${tableOrderNumbers[currentTable]}\n`);
-    commands.push(`Waiter: ${staffName}\n`);
+    commands.push(`Waiter: ${waiterName}\n`);
 commands.push(`POS Staff: ${operatorName}\n`);
     commands.push(`Date: ${dateStr} ${timestamp}\n`);
 
@@ -1476,7 +1475,7 @@ commands.push(`POS Staff: ${operatorName}\n`);
     commands.push(`Table: ${currentTable}\n`);
 commands.push(`Order No: ${tableOrderNumbers[currentTable]}\n`);
 commands.push(`Order No: ${tableOrderNumbers[currentTable]}\n`);
-commands.push(`Waiter: ${waiterName}\n`);
+commands.push(`WAITER: ${waiterName}\n`);
 commands.push(`POS Staff: ${operatorName}\n`);
     commands.push(`Payment: ${method}\n`);
     commands.push(`Date: ${dateStr} ${timestamp}\n`);
