@@ -459,6 +459,8 @@
 
 <button class="sub-tab-btn" onclick="switchFoodSubTab('kids-meal')">Kids Meal</button>
 
+<button class="sub-tab-btn" onclick="switchFoodSubTab('servers')">SERVERS</button>
+
         <div id="drink-sub-tabs" class="sub-tab-bar" style="display: none;">
             <button class="sub-tab-btn active" onclick="switchDrinkSubTab('soft-drinks')">Soft Drinks</button>
             <button class="sub-tab-btn" onclick="switchDrinkSubTab('energy-beer')">Energy & Beer</button>
@@ -683,6 +685,30 @@
     <div class="item-card" data-category="food" onclick="addToOrder('Fried Rice for Kids', 50)">
         <span class="item-name">Fried Rice for Kids</span>
         <span class="item-price">GHS 50</span>
+    </div>
+
+</div>
+
+<div id="servers" class="grid-container food-grid">
+
+    <div class="item-card" data-category="food" onclick="addToOrder('Hannah', 0)">
+        <span class="item-name">Hannah</span>
+    </div>
+
+    <div class="item-card" data-category="food" onclick="addToOrder('Ellen', 0)">
+        <span class="item-name">Ellen</span>
+    </div>
+
+    <div class="item-card" data-category="food" onclick="addToOrder('King', 0)">
+        <span class="item-name">King</span>
+    </div>
+
+    <div class="item-card" data-category="food" onclick="addToOrder('Akua', 0)">
+        <span class="item-name">Akua</span>
+    </div>
+
+    <div class="item-card" data-category="food" onclick="addToOrder('Sheila', 0)">
+        <span class="item-name">Sheila</span>
     </div>
 
 </div>
@@ -1143,7 +1169,8 @@ sessionStorage.removeItem("currentLoggedInStaff");
         'T6': [], 'T7': [], 'T8': [], 'T9': [], 'T10': []
     };
 
-const tableOrderNumbers = {};
+const tableOrderNumbers =
+    JSON.parse(localStorage.getItem("tableOrderNumbers")) || {};
 
         // Stores completed paid orders
 
@@ -1589,6 +1616,18 @@ tableOrders[currentTable] = [];
 
 delete tableOrderNumbers[currentTable];
 
+// SAVE UPDATED TABLE ORDERS
+localStorage.setItem(
+    "tableOrders",
+    JSON.stringify(tableOrders)
+);
+
+// SAVE UPDATED ORDER NUMBERS
+localStorage.setItem(
+    "tableOrderNumbers",
+    JSON.stringify(tableOrderNumbers)
+);
+
 updateReceiptDisplay();
 
 updateTableIndicators();
@@ -1718,9 +1757,14 @@ alert("Payment completed and moved to End of Day Report.");
     // CREATE ORDER NUMBER IF TABLE HAS NONE
     if (!tableOrderNumbers[currentTable]) {
 
-        tableOrderNumbers[currentTable] =
-            generateOrderNumber(currentTable);
-    }
+    tableOrderNumbers[currentTable] =
+        generateOrderNumber(currentTable);
+
+    localStorage.setItem(
+        "tableOrderNumbers",
+        JSON.stringify(tableOrderNumbers)
+    );
+}
 
     // CHECK IF ITEM ALREADY EXISTS
     const existingItem =
