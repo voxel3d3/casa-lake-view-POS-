@@ -1232,7 +1232,8 @@ const tableOrderNumbers =
 
 let endOfDayOrders = JSON.parse(localStorage.getItem("endOfDayOrders")) || [];
 
-        let totalTablesCount = 10; 
+        let totalTablesCount =
+    parseInt(localStorage.getItem("totalTablesCount")) || 10; 
         let currentTable = 'T1';
 
         let currentMainMode = 'foods';
@@ -1281,6 +1282,30 @@ document.getElementById("login-screen").style.display = "flex";
 
     rebuildSearchIndex();
     updateReceiptDisplay();
+
+for (let i = 11; i <= totalTablesCount; i++) {
+
+    const tableId = `T${i}`;
+
+    if (!document.getElementById(`btn-${tableId}`)) {
+
+        const btn = document.createElement("button");
+
+        btn.className = "table-btn";
+        btn.id = `btn-${tableId}`;
+        btn.innerText = tableId;
+
+        btn.onclick = () => switchTable(tableId);
+
+        const addBtn =
+            document.getElementById("add-table-action");
+
+        document
+            .getElementById("tables-container")
+            .insertBefore(btn, addBtn);
+    }
+}
+
     updateTableIndicators();
 
    
@@ -1724,6 +1749,16 @@ alert("Payment completed and moved to End of Day Report.");
             switchTable(newTableId);
             document.getElementById('tables-container').scrollLeft = document.getElementById('tables-container').scrollWidth;
         }
+
+localStorage.setItem(
+    "totalTablesCount",
+    totalTablesCount
+);
+
+localStorage.setItem(
+    "tableOrders",
+    JSON.stringify(tableOrders)
+);
 
         function updateTableIndicators() {
             for (let tableId in tableOrders) {
