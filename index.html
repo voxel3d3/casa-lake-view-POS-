@@ -461,6 +461,8 @@
 
 <button class="sub-tab-btn" onclick="switchFoodSubTab('servers')">SERVERS</button>
 
+<button class="sub-tab-btn" onclick="switchFoodSubTab('alhaji-package')">Alhaji Package</button>
+
         <div id="drink-sub-tabs" class="sub-tab-bar" style="display: none;">
             <button class="sub-tab-btn active" onclick="switchDrinkSubTab('soft-drinks')">Soft Drinks</button>
             <button class="sub-tab-btn" onclick="switchDrinkSubTab('energy-beer')">Energy & Beer</button>
@@ -709,6 +711,34 @@
 
     <div class="item-card" data-category="food" onclick="addToOrder('Sheila', 0)">
         <span class="item-name">Sheila</span>
+    </div>
+
+</div>
+
+<div id="alhaji-package" class="grid-container food-grid">
+
+    <div class="item-card" data-category="food"
+        onclick="addToOrder('Jollof Rice with Chicken', 100)">
+        <span class="item-name">Jollof Rice with Chicken</span>
+        <span class="item-price">GHS 100</span>
+    </div>
+
+    <div class="item-card" data-category="food"
+        onclick="addToOrder('Fried Rice with Chicken', 100)">
+        <span class="item-name">Fried Rice with Chicken</span>
+        <span class="item-price">GHS 100</span>
+    </div>
+
+    <div class="item-card" data-category="food"
+        onclick="addToOrder('All Season Pizza', 170)">
+        <span class="item-name">All Season Pizza</span>
+        <span class="item-price">GHS 170</span>
+    </div>
+
+    <div class="item-card" data-category="food"
+        onclick="addToOrder('Can Coke', 70)">
+        <span class="item-name">Can Coke</span>
+        <span class="item-price">GHS 70</span>
     </div>
 
 </div>
