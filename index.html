@@ -21,7 +21,15 @@
         .table-btn.has-order { background: #ff4444; color: white; }
         .control-btn { padding: 10px; border: none; cursor: pointer; color: white; margin-top: 5px; width: 100%; }
         .order-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; border-bottom: 1px solid #eee; padding: 5px; }
-        @media print { body * { visibility: hidden; } #printableArea, #printableArea * { visibility: visible; } #printableArea { position: absolute; left: 0; top: 0; width: 100%; } }
+        
+        /* Thermal Printer Optimization */
+        @media print {
+            body * { visibility: hidden; }
+            #printableArea, #printableArea * { visibility: visible; }
+            #printableArea { position: absolute; left: 0; top: 0; width: 280px; font-family: 'Courier New', Courier, monospace; }
+            #printableArea h2 { font-size: 16px; text-align: center; }
+            #printableArea ul { list-style: none; padding: 0; font-size: 14px; }
+        }
     </style>
 </head>
 <body>
@@ -55,9 +63,9 @@
         <h3>Order for: <span id="displayTable">T1</span></h3>
         <div id="orderList"></div>
         <h4>Total: GHS <span id="total">0</span></h4>
-        <button class="control-btn" style="background:#333;" onclick="printOrder('kitchen')">Print Kitchen</button>
-        <button class="control-btn" style="background:#333;" onclick="printOrder('customer')">Print Customer</button>
-        <button class="control-btn" style="background:#d9534f;" onclick="printOrder('payment')">Print Payment & Clear</button>
+        <button class="control-btn" style="background:#333;" onclick="printOrder('kitchen')">Print Kitchen (KOT)</button>
+        <button class="control-btn" style="background:#333;" onclick="printOrder('customer')">Print Receipt</button>
+        <button class="control-btn" style="background:#d9534f;" onclick="printOrder('payment')">Finalize Payment & Print</button>
     </div>
 </div>
 
@@ -70,12 +78,8 @@
     function showTab(t) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
         document.getElementById(t).classList.add('active');
-        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.toggle('active', btn.innerText === (t === 'food' ? 'FOOD' : 'DRINKS')));
     }
-    function toggleCategory(id) {
-        let el = document.getElementById(id);
-        el.style.display = (el.style.display === 'block') ? 'none' : 'block';
-    }
+    function toggleCategory(id) { document.getElementById(id).style.display = (document.getElementById(id).style.display === 'block') ? 'none' : 'block'; }
     function switchTable(t) {
         currentTable = t;
         document.getElementById('displayTable').innerText = t;
@@ -117,14 +121,14 @@
     }
     function printOrder(type) {
         let items = ordersData[currentTable];
-        let html = `<h2>${currentTable} - ${type.toUpperCase()}</h2><ul>`;
+        let html = `<h2>Casa Lake View</h2><p>Table: ${currentTable}</p><p>Type: ${type.toUpperCase()}</p><hr><ul>`;
         let total = 0;
         items.forEach(item => {
             if (type === 'kitchen' && item.type !== 'food') return;
             html += `<li>${item.name} x${item.qty} = ${item.price * item.qty}</li>`;
             total += (item.price * item.qty);
         });
-        html += `</ul><h3>Total: ${total} GHS</h3>`;
+        html += `</ul><hr><h3>Total: ${total} GHS</h3><p>Thank you!</p>`;
         document.getElementById('printableArea').innerHTML = html;
         window.print();
         if (type === 'payment') { ordersData[currentTable] = []; updateTableStatus(); renderOrder(); }
