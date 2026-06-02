@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Casa Lake View POS</title>
@@ -15,8 +15,8 @@
         .table-btn { padding: 10px; border: 1px solid #4CAF50; background: white; cursor: pointer; text-align: center; }
         .table-btn.active { border: 3px solid #000; }
         .table-btn.has-order { background: #ff4444; color: white; }
-        .control-btn { padding: 10px; border: none; cursor: pointer; color: white; margin-top: 5px; width: 100%; }
-        .order-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 5px; }
+        .control-btn { padding: 12px; border: none; cursor: pointer; color: white; margin-top: 5px; width: 100%; font-size: 16px; }
+        .order-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 8px; }
     </style>
 </head>
 <body>
@@ -91,37 +91,27 @@
     
     function printOrder(type) {
         let items = ordersData[currentTable];
-        let html = `
-        <html><head>
-        <style>
-            @page { size: 80mm auto; margin: 0; }
-            body { width: 80mm; font-family: 'Courier New', Courier, monospace; font-size: 14px; }
-        </style>
-        </head><body>
-        <h2>CASA LAKE VIEW</h2>
-        <p>Table: ${currentTable} | Type: ${type.toUpperCase()}</p>
-        <hr><ul>`;
-        
+        // Generate simplified receipt content
+        let receiptWindow = window.open('', '_blank', 'width=300,height=600');
+        let html = `<html><body style="width:260px; font-size:16px; font-family:sans-serif;">
+            <h2 style="text-align:center;">CASA LAKE VIEW</h2>
+            <p style="text-align:center;">${type.toUpperCase()} | ${currentTable}</p>
+            <hr>`;
         let total = 0;
         items.forEach(item => {
             if (type === 'kitchen' && item.type !== 'food') return;
-            html += `<li>${item.name} x${item.qty} = ${item.price * item.qty}</li>`;
+            html += `<div style="display:flex; justify-content:space-between;"><span>${item.name} x${item.qty}</span><span>${item.price * item.qty}</span></div>`;
             total += (item.price * item.qty);
         });
-        html += `</ul><hr><h3>TOTAL: ${total} GHS</h3><br><br><br></body></html>`;
+        html += `<hr><h3 style="text-align:right;">TOTAL: ${total} GHS</h3></body></html>`;
         
-        let printFrame = document.createElement('iframe');
-        printFrame.style.width = '0'; printFrame.style.height = '0';
-        document.body.appendChild(printFrame);
-        let doc = printFrame.contentWindow.document;
-        doc.open(); doc.write(html); doc.close();
-        
+        receiptWindow.document.write(html);
+        receiptWindow.document.close();
+        // Trigger print immediately in the new window
         setTimeout(() => {
-            printFrame.contentWindow.print();
-            setTimeout(() => {
-                document.body.removeChild(printFrame);
-                if (type === 'payment') { ordersData[currentTable] = []; updateStatus(); renderOrder(); }
-            }, 1000);
+            receiptWindow.print();
+            receiptWindow.close();
+            if (type === 'payment') { ordersData[currentTable] = []; updateStatus(); renderOrder(); }
         }, 500);
     }
     function addTable() {
