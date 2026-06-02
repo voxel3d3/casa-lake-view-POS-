@@ -1210,6 +1210,10 @@ function resetSystem() {
     localStorage.removeItem("endOfDayOrders");
     localStorage.removeItem("tableOrderNumbers");
 
+localStorage.removeItem("totalTablesCount");
+
+totalTablesCount = 10;
+
 sessionStorage.removeItem("currentLoggedInStaff");
 
     updateReceiptDisplay();
@@ -1217,7 +1221,8 @@ sessionStorage.removeItem("currentLoggedInStaff");
     generateEndOfDayReport();
 
     alert("System reset successfully.");
-}
+
+location.reload();
 
         const tableOrders =
     JSON.parse(localStorage.getItem("tableOrders")) || {
