@@ -1153,27 +1153,32 @@ const staffAccounts = [
 // LOGIN FUNCTION
 
 function loginUser() {
-    currentLoggedInStaff = "Admin";
+
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    const foundUser = staffAccounts.find(user =>
+        user.username === username &&
+        user.password === password
+    );
+
+    if (!foundUser) {
+        alert("Wrong Username or Password");
+        return;
+    }
+
+    // ✅ SET LOGGED IN STAFF NAME
+    currentLoggedInStaff = foundUser.fullName;
+
+    // ✅ SAVE LOGIN STATE (IMPORTANT)
+    sessionStorage.setItem("loggedIn", "true");
+
+    // (optional but useful)
+    sessionStorage.setItem("staffName", foundUser.fullName);
+
+    // ✅ HIDE LOGIN SCREEN
     document.getElementById("login-screen").style.display = "none";
     document.body.style.overflow = "auto";
-}
-
-function showModal(callback) {
-
-    document.getElementById('print-modal').style.display = 'flex';
-
-    document.getElementById('final-print-btn').onclick = function() {
-
-        const name =
-            document.getElementById('staff-name-input').value;
-
-        const method =
-            document.getElementById('payment-method-select').value;
-
-        document.getElementById('print-modal').style.display = 'none';
-
-        callback(name, method);
-    };
 }
 
 function resetSystem() {
@@ -1270,37 +1275,41 @@ function generateOrderNumber(tableId) {
     rebuildSearchIndex();
     updateReceiptDisplay();
 
-    // 🔐 CHECK LOGIN STATUS FIRST
-    document.getElementById("login-screen").style.display = "none";
-document.body.style.overflow = "auto";
-currentLoggedInStaff = "Admin";
+    // 🔐 LOGIN CHECK
+    const isLoggedIn = sessionStorage.getItem("loggedIn");
 
-for (let i = 11; i <= totalTablesCount; i++) {
-
-    const tableId = `T${i}`;
-
-    if (!document.getElementById(`btn-${tableId}`)) {
-
-        const btn = document.createElement("button");
-
-        btn.className = "table-btn";
-        btn.id = `btn-${tableId}`;
-        btn.innerText = tableId;
-
-        btn.onclick = () => switchTable(tableId);
-
-        const addBtn =
-            document.getElementById("add-table-action");
-
-        document
-            .getElementById("tables-container")
-            .insertBefore(btn, addBtn);
+    if (!isLoggedIn) {
+        document.getElementById("login-screen").style.display = "flex";
+        document.body.style.overflow = "hidden";
+    } else {
+        document.getElementById("login-screen").style.display = "none";
+        document.body.style.overflow = "auto";
     }
-}
+
+    // TABLE CREATION LOGIC
+    for (let i = 11; i <= totalTablesCount; i++) {
+
+        const tableId = `T${i}`;
+
+        if (!document.getElementById(`btn-${tableId}`)) {
+
+            const btn = document.createElement("button");
+
+            btn.className = "table-btn";
+            btn.id = `btn-${tableId}`;
+            btn.innerText = tableId;
+
+            btn.onclick = () => switchTable(tableId);
+
+            const addBtn = document.getElementById("add-table-action");
+
+            document
+                .getElementById("tables-container")
+                .insertBefore(btn, addBtn);
+        }
+    }
 
     updateTableIndicators();
-
-   
 });
 
         async function getUsbPrinterConnection() {
@@ -2228,3 +2237,4 @@ Reset Day
     <div id="report-container" style="margin-top: 20px;"></div>
 </div>
 </body>
+</html>
