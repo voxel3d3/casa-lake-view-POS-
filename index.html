@@ -1156,6 +1156,8 @@ function loginUser() {
 
     document.getElementById("login-screen").style.display = "none";
 
+    document.body.style.overflow = "auto"; // ✅ IMPORTANT FIX
+
     alert("Welcome " + currentLoggedInStaff);
 }
 
@@ -1275,17 +1277,14 @@ function generateOrderNumber(tableId) {
     // 🔐 CHECK LOGIN STATUS FIRST
     const savedUser = sessionStorage.getItem("currentLoggedInStaff");
 
-    if (savedUser) {
-
-        currentLoggedInStaff = savedUser;
-
-        document.getElementById("login-screen").style.display = "none";
-
-    } else {
-
-       
-
-    }
+if (savedUser) {
+    currentLoggedInStaff = savedUser;
+    document.getElementById("login-screen").style.display = "none";
+    document.body.style.overflow = "auto";
+} else {
+    document.getElementById("login-screen").style.display = "flex";
+    document.body.style.overflow = "hidden";
+}
 
 for (let i = 11; i <= totalTablesCount; i++) {
 
