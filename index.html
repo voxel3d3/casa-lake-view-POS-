@@ -376,7 +376,8 @@
 
 <body>
 
-<div id="login-screen"
+<div id="login-screen" style="display:none;">
+
      style="
         position:fixed;
         top:0;
@@ -1104,7 +1105,8 @@ function openPendingBillPreview() {
 }
 
 // CURRENT LOGGED IN STAFF
-let currentLoggedInStaff = "";
+
+let currentLoggedInStaff = "Admin";
 
 // POS STAFF ACCOUNTS
 const staffAccounts = [
@@ -1136,29 +1138,9 @@ const staffAccounts = [
 // LOGIN FUNCTION
 
 function loginUser() {
-
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value.trim();
-
-    const foundUser = staffAccounts.find(user =>
-        user.username === username &&
-        user.password === password
-    );
-
-    if (!foundUser) {
-        alert("Wrong Username or Password");
-        return;
-    }
-
-    currentLoggedInStaff = foundUser.fullName;
-
-    sessionStorage.setItem("currentLoggedInStaff", currentLoggedInStaff);
-
+    currentLoggedInStaff = "Admin";
     document.getElementById("login-screen").style.display = "none";
-
-    document.body.style.overflow = "auto"; // ✅ IMPORTANT FIX
-
-    alert("Welcome " + currentLoggedInStaff);
+    document.body.style.overflow = "auto";
 }
 
 function showModal(callback) {
@@ -1275,16 +1257,9 @@ function generateOrderNumber(tableId) {
     updateReceiptDisplay();
 
     // 🔐 CHECK LOGIN STATUS FIRST
-    const savedUser = sessionStorage.getItem("currentLoggedInStaff");
-
-if (savedUser) {
-    currentLoggedInStaff = savedUser;
     document.getElementById("login-screen").style.display = "none";
-    document.body.style.overflow = "auto";
-} else {
-    document.getElementById("login-screen").style.display = "flex";
-    document.body.style.overflow = "hidden";
-}
+document.body.style.overflow = "auto";
+currentLoggedInStaff = "Admin";
 
 for (let i = 11; i <= totalTablesCount; i++) {
 
