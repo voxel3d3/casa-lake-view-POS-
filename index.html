@@ -11,41 +11,26 @@
         .category-header { font-weight: bold; padding: 15px; background: #eee; cursor: pointer; border: 1px solid #ddd; margin-top: 5px; }
         .category-content { display: none; padding: 10px; border: 1px solid #ddd; }
         button.item-btn { padding: 10px; margin: 4px; cursor: pointer; border: 1px solid #ccc; width: 100%; text-align: left; }
-        .nav-btn { padding: 15px; width: 48%; cursor: pointer; background: #ddd; border: none; }
-        .nav-btn.active { background: #4CAF50; color: white; }
-        .tab-content { display: none; }
-        .active { display: block; }
         .table-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 10px; }
         .table-btn { padding: 10px; border: 1px solid #4CAF50; background: white; cursor: pointer; text-align: center; }
         .table-btn.active { border: 3px solid #000; }
         .table-btn.has-order { background: #ff4444; color: white; }
         .control-btn { padding: 10px; border: none; cursor: pointer; color: white; margin-top: 5px; width: 100%; }
-        .order-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; border-bottom: 1px solid #eee; padding: 5px; }
-        
-        /* Thermal Printer Optimization */
-        @media print {
-            body * { visibility: hidden; }
-            #printableArea, #printableArea * { visibility: visible; }
-            #printableArea { position: absolute; left: 0; top: 0; width: 280px; font-family: 'Courier New', Courier, monospace; }
-            #printableArea h2 { font-size: 16px; text-align: center; }
-            #printableArea ul { list-style: none; padding: 0; font-size: 14px; }
-        }
+        .order-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 5px; }
     </style>
 </head>
 <body>
 
 <div id="menu-section">
-    <button class="nav-btn active" onclick="showTab('food')">FOOD</button>
-    <button class="nav-btn" onclick="showTab('drinks')">DRINKS</button>
-    <div id="food" class="tab-content active">
-        <div class="category-header" onclick="toggleCategory('f1')">COMBO MEALS ▼</div>
+    <div id="food">
+        <div class="category-header" onclick="document.getElementById('f1').style.display = (document.getElementById('f1').style.display === 'block') ? 'none' : 'block'">COMBO MEALS ▼</div>
         <div id="f1" class="category-content">
             <button class="item-btn" onclick="addToCart('Jollof w/ 6 wings', 120, 'food')">Jollof w/ 6 wings - 120</button>
             <button class="item-btn" onclick="addToCart('Pizza', 150, 'food')">Pizza - 150</button>
         </div>
     </div>
-    <div id="drinks" class="tab-content">
-        <div class="category-header" onclick="toggleCategory('d1')">SOFT DRINKS ▼</div>
+    <div id="drinks">
+        <div class="category-header" onclick="document.getElementById('d1').style.display = (document.getElementById('d1').style.display === 'block') ? 'none' : 'block'">SOFT DRINKS ▼</div>
         <div id="d1" class="category-content">
             <button class="item-btn" onclick="addToCart('Bottled Water', 10, 'drink')">Bottled Water - 10</button>
         </div>
@@ -57,29 +42,21 @@
         <h3>Tables</h3>
         <div id="tableContainer" class="table-grid"><button id="btn-T1" class="table-btn active" onclick="switchTable('T1')">T1</button></div>
         <button class="control-btn" style="background:#4CAF50;" onclick="addTable()">+ Add Table</button>
-        <button class="control-btn" style="background:#f44336;" onclick="removeTable()">- Remove Table</button>
     </div>
     <div class="section">
         <h3>Order for: <span id="displayTable">T1</span></h3>
         <div id="orderList"></div>
         <h4>Total: GHS <span id="total">0</span></h4>
-        <button class="control-btn" style="background:#333;" onclick="printOrder('kitchen')">Print Kitchen (KOT)</button>
-        <button class="control-btn" style="background:#333;" onclick="printOrder('customer')">Print Receipt</button>
-        <button class="control-btn" style="background:#d9534f;" onclick="printOrder('payment')">Finalize Payment & Print</button>
+        <button class="control-btn" style="background:#333;" onclick="printOrder('kitchen')">1. Print Kitchen</button>
+        <button class="control-btn" style="background:#333;" onclick="printOrder('customer')">2. Print Customer</button>
+        <button class="control-btn" style="background:#d9534f;" onclick="printOrder('payment')">3. Pay & Clear</button>
     </div>
 </div>
-
-<div id="printableArea" style="display:none;"></div>
 
 <script>
     let currentTable = 'T1';
     let ordersData = { 'T1': [] };
 
-    function showTab(t) {
-        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-        document.getElementById(t).classList.add('active');
-    }
-    function toggleCategory(id) { document.getElementById(id).style.display = (document.getElementById(id).style.display === 'block') ? 'none' : 'block'; }
     function switchTable(t) {
         currentTable = t;
         document.getElementById('displayTable').innerText = t;
@@ -89,69 +66,59 @@
     }
     function addToCart(name, price, type) {
         let items = ordersData[currentTable];
-        let existing = items.find(i => i.name === name);
-        if (existing) existing.qty++;
-        else items.push({ name, price, type, qty: 1 });
-        updateTableStatus();
-        renderOrder();
-    }
-    function changeQty(index, delta) {
-        let items = ordersData[currentTable];
-        items[index].qty += delta;
-        if (items[index].qty <= 0) items.splice(index, 1);
-        updateTableStatus();
-        renderOrder();
+        let ex = items.find(i => i.name === name);
+        if (ex) ex.qty++; else items.push({ name, price, type, qty: 1 });
+        updateStatus(); renderOrder();
     }
     function renderOrder() {
-        const list = document.getElementById('orderList');
-        list.innerHTML = '';
+        const list = document.getElementById('orderList'); list.innerHTML = '';
         let total = 0;
         ordersData[currentTable].forEach((item, index) => {
             let div = document.createElement('div');
             div.className = 'order-item';
-            div.innerHTML = `<span>${item.name} (${item.qty})</span> <span><button onclick="changeQty(${index}, -1)">-</button><button onclick="changeQty(${index}, 1)">+</button></span>`;
+            div.innerHTML = `<span>${item.name} (${item.qty})</span> <span><button onclick="changeQty(${index}, 1)">+</button><button onclick="changeQty(${index}, -1)">-</button></span>`;
             list.appendChild(div);
             total += (item.price * item.qty);
         });
         document.getElementById('total').innerText = total;
     }
-    function updateTableStatus() {
-        let btn = document.getElementById('btn-' + currentTable);
-        btn.classList.toggle('has-order', ordersData[currentTable].length > 0);
+    function changeQty(i, d) {
+        ordersData[currentTable][i].qty += d;
+        if(ordersData[currentTable][i].qty <= 0) ordersData[currentTable].splice(i, 1);
+        updateStatus(); renderOrder();
     }
+    function updateStatus() { document.getElementById('btn-' + currentTable).classList.toggle('has-order', ordersData[currentTable].length > 0); }
+    
     function printOrder(type) {
         let items = ordersData[currentTable];
-        let html = `<h2>Casa Lake View</h2><p>Table: ${currentTable}</p><p>Type: ${type.toUpperCase()}</p><hr><ul>`;
+        let html = `<div style="width:280px; font-family:monospace;"><h2>Casa Lake View</h2><p>Table: ${currentTable}</p><p>Type: ${type.toUpperCase()}</p><hr><ul>`;
         let total = 0;
         items.forEach(item => {
             if (type === 'kitchen' && item.type !== 'food') return;
             html += `<li>${item.name} x${item.qty} = ${item.price * item.qty}</li>`;
             total += (item.price * item.qty);
         });
-        html += `</ul><hr><h3>Total: ${total} GHS</h3><p>Thank you!</p>`;
-        document.getElementById('printableArea').innerHTML = html;
-        window.print();
-        if (type === 'payment') { ordersData[currentTable] = []; updateTableStatus(); renderOrder(); }
+        html += `</ul><hr><h3>Total: ${total} GHS</h3></div>`;
+        
+        let printFrame = document.createElement('iframe');
+        printFrame.style.position = 'absolute'; printFrame.style.width = '0'; printFrame.style.height = '0';
+        document.body.appendChild(printFrame);
+        let doc = printFrame.contentWindow.document;
+        doc.open(); doc.write(html); doc.close();
+        printFrame.contentWindow.print();
+        
+        setTimeout(() => {
+            document.body.removeChild(printFrame);
+            if (type === 'payment') { ordersData[currentTable] = []; updateStatus(); renderOrder(); }
+        }, 500);
     }
     function addTable() {
-        let count = Object.keys(ordersData).length + 1;
-        let tName = 'T' + count;
+        let tName = 'T' + (Object.keys(ordersData).length + 1);
         ordersData[tName] = [];
         let btn = document.createElement('button');
-        btn.id = 'btn-' + tName;
-        btn.className = 'table-btn';
-        btn.innerText = tName;
+        btn.id = 'btn-' + tName; btn.className = 'table-btn'; btn.innerText = tName;
         btn.onclick = () => switchTable(tName);
         document.getElementById('tableContainer').appendChild(btn);
-    }
-    function removeTable() {
-        let container = document.getElementById('tableContainer');
-        if (container.children.length > 1) {
-            let lastTable = container.lastElementChild.innerText;
-            delete ordersData[lastTable];
-            container.removeChild(container.lastElementChild);
-            if(currentTable === lastTable) switchTable('T1');
-        }
     }
 </script>
 </body>
