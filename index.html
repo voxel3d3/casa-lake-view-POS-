@@ -1167,16 +1167,10 @@ function loginUser() {
         return;
     }
 
-    // ✅ SET LOGGED IN STAFF NAME
     currentLoggedInStaff = foundUser.fullName;
 
-    // ✅ SAVE LOGIN STATE (IMPORTANT)
     sessionStorage.setItem("loggedIn", "true");
 
-    // (optional but useful)
-    sessionStorage.setItem("staffName", foundUser.fullName);
-
-    // ✅ HIDE LOGIN SCREEN
     document.getElementById("login-screen").style.display = "none";
     document.body.style.overflow = "auto";
 }
@@ -1275,7 +1269,6 @@ function generateOrderNumber(tableId) {
     rebuildSearchIndex();
     updateReceiptDisplay();
 
-    // 🔐 LOGIN CHECK
     const isLoggedIn = sessionStorage.getItem("loggedIn");
 
     if (!isLoggedIn) {
@@ -1286,9 +1279,7 @@ function generateOrderNumber(tableId) {
         document.body.style.overflow = "auto";
     }
 
-    // TABLE CREATION LOGIC
     for (let i = 11; i <= totalTablesCount; i++) {
-
         const tableId = `T${i}`;
 
         if (!document.getElementById(`btn-${tableId}`)) {
@@ -1301,11 +1292,8 @@ function generateOrderNumber(tableId) {
 
             btn.onclick = () => switchTable(tableId);
 
-            const addBtn = document.getElementById("add-table-action");
-
-            document
-                .getElementById("tables-container")
-                .insertBefore(btn, addBtn);
+            document.getElementById("tables-container")
+                .insertBefore(btn, document.getElementById("add-table-action"));
         }
     }
 
@@ -2237,4 +2225,3 @@ Reset Day
     <div id="report-container" style="margin-top: 20px;"></div>
 </div>
 </body>
-</html>
