@@ -91,25 +91,37 @@
     
     function printOrder(type) {
         let items = ordersData[currentTable];
-        let html = `<div style="width:280px; font-family:monospace;"><h2>Casa Lake View</h2><p>Table: ${currentTable}</p><p>Type: ${type.toUpperCase()}</p><hr><ul>`;
+        let html = `
+        <html><head>
+        <style>
+            @page { size: 80mm auto; margin: 0; }
+            body { width: 80mm; font-family: 'Courier New', Courier, monospace; font-size: 14px; }
+        </style>
+        </head><body>
+        <h2>CASA LAKE VIEW</h2>
+        <p>Table: ${currentTable} | Type: ${type.toUpperCase()}</p>
+        <hr><ul>`;
+        
         let total = 0;
         items.forEach(item => {
             if (type === 'kitchen' && item.type !== 'food') return;
             html += `<li>${item.name} x${item.qty} = ${item.price * item.qty}</li>`;
             total += (item.price * item.qty);
         });
-        html += `</ul><hr><h3>Total: ${total} GHS</h3></div>`;
+        html += `</ul><hr><h3>TOTAL: ${total} GHS</h3><br><br><br></body></html>`;
         
         let printFrame = document.createElement('iframe');
-        printFrame.style.position = 'absolute'; printFrame.style.width = '0'; printFrame.style.height = '0';
+        printFrame.style.width = '0'; printFrame.style.height = '0';
         document.body.appendChild(printFrame);
         let doc = printFrame.contentWindow.document;
         doc.open(); doc.write(html); doc.close();
-        printFrame.contentWindow.print();
         
         setTimeout(() => {
-            document.body.removeChild(printFrame);
-            if (type === 'payment') { ordersData[currentTable] = []; updateStatus(); renderOrder(); }
+            printFrame.contentWindow.print();
+            setTimeout(() => {
+                document.body.removeChild(printFrame);
+                if (type === 'payment') { ordersData[currentTable] = []; updateStatus(); renderOrder(); }
+            }, 1000);
         }, 500);
     }
     function addTable() {
