@@ -1733,22 +1733,12 @@ alert("Payment completed and moved to End of Day Report.");
         }
 
         function createNewTable() {
-            totalTablesCount++;
-            const newTableId = `T${totalTablesCount}`;
-            tableOrders[newTableId] = [];
-            
-            const newButton = document.createElement('button');
-            newButton.className = 'table-btn';
-            newButton.id = `btn-${newTableId}`;
-            newButton.innerText = newTableId;
-            newButton.setAttribute('onclick', `switchTable('${newTableId}')`);
-            
-            const addActionBtn = document.getElementById('add-table-action');
-            document.getElementById('tables-container').insertBefore(newButton, addActionBtn);
-            
-            switchTable(newTableId);
-            document.getElementById('tables-container').scrollLeft = document.getElementById('tables-container').scrollWidth;
-        }
+
+    totalTablesCount++;
+
+    const newTableId = `T${totalTablesCount}`;
+
+    tableOrders[newTableId] = [];
 
 localStorage.setItem(
     "totalTablesCount",
@@ -1759,6 +1749,39 @@ localStorage.setItem(
     "tableOrders",
     JSON.stringify(tableOrders)
 );
+
+    const newButton = document.createElement('button');
+
+    newButton.className = 'table-btn';
+    newButton.id = `btn-${newTableId}`;
+    newButton.innerText = newTableId;
+
+    newButton.onclick = () => switchTable(newTableId);
+
+    const addActionBtn =
+        document.getElementById('add-table-action');
+
+    document
+        .getElementById('tables-container')
+        .insertBefore(newButton, addActionBtn);
+
+    // SAVE NEW TABLE COUNT
+    localStorage.setItem(
+        "totalTablesCount",
+        totalTablesCount
+    );
+
+    // SAVE UPDATED TABLES
+    localStorage.setItem(
+        "tableOrders",
+        JSON.stringify(tableOrders)
+    );
+
+    switchTable(newTableId);
+
+    document.getElementById('tables-container').scrollLeft =
+        document.getElementById('tables-container').scrollWidth;
+}
 
         function updateTableIndicators() {
             for (let tableId in tableOrders) {
