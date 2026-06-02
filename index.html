@@ -1083,7 +1083,23 @@
         </div>
     </div>
 
-    <script> // --- THE BRIDGE: Connects the popup to your printer ---
+    <script> 
+
+ let totalTablesCount =
+    parseInt(localStorage.getItem("totalTablesCount")) || 10;
+
+let currentTable = 'T1';
+
+let tableOrders =
+    JSON.parse(localStorage.getItem("tableOrders")) || {};
+
+let tableOrderNumbers =
+    JSON.parse(localStorage.getItem("tableOrderNumbers")) || {};
+
+let endOfDayOrders =
+    JSON.parse(localStorage.getItem("endOfDayOrders")) || [];
+
+// --- THE BRIDGE: Connects the popup to your printer ---
 
 function openKitchenPreview() {
     showModal((name, method) =>
@@ -1207,8 +1223,7 @@ const tableOrderNumbers =
 
 let endOfDayOrders = JSON.parse(localStorage.getItem("endOfDayOrders")) || [];
 
-        let totalTablesCount =
-    parseInt(localStorage.getItem("totalTablesCount")) || 10; 
+       
         let currentTable = 'T1';
 
         let currentMainMode = 'foods';
@@ -2213,4 +2228,3 @@ Reset Day
     <div id="report-container" style="margin-top: 20px;"></div>
 </div>
 </body>
-</html>
