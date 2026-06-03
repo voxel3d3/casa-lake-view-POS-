@@ -1368,6 +1368,8 @@ function loginUser() {
 
 function resetSystem() {
 
+localStorage.removeItem("stockItems");
+
     const confirmReset = confirm(
         "Are you sure you want to clear all orders and reports?"
     );
