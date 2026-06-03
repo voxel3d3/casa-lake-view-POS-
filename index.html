@@ -1,3 +1,4 @@
+Vu
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1154,8 +1155,6 @@ const staffAccounts = [
 
 function loginUser() {
 
-    alert("LOGIN FUNCTION RUNNING");
-
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value.trim();
 
@@ -1169,12 +1168,21 @@ function loginUser() {
         return;
     }
 
+    // Save logged-in staff
     currentLoggedInStaff = foundUser.fullName;
-
     sessionStorage.setItem("loggedIn", "true");
+    sessionStorage.setItem("staffName", foundUser.fullName);
 
-    document.getElementById("login-screen").style.display = "none";
+    // Hide login screen
+    const loginScreen = document.getElementById("login-screen");
 
+    if (loginScreen) {
+        loginScreen.style.display = "none";
+    } else {
+        alert("ERROR: login-screen not found in HTML");
+    }
+
+    // Allow page scrolling
     document.body.style.overflow = "auto";
 
     alert("LOGIN SUCCESS");
