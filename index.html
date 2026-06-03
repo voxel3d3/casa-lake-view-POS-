@@ -2368,6 +2368,60 @@ async function printEndOfDayReport() {
 
     alert("End of Day Report Printed Successfully.");
 }
+
+function printStockReport(){
+
+    let content =
+        document.getElementById("stock-container").innerHTML;
+
+    let win = window.open("", "", "width=900,height=700");
+
+    win.document.write(`
+        <html>
+        <head>
+            <title>Stock Report</title>
+        </head>
+        <body>
+            <h2>CASA LAKE VIEW RESORT</h2>
+            <h3>Stock Report</h3>
+            ${content}
+        </body>
+        </html>
+    `);
+
+    win.document.close();
+    win.print();
+}
+
+function saveStockPDF(){
+
+    let content =
+        document.getElementById("stock-container").innerHTML;
+
+    let win = window.open("", "", "width=900,height=700");
+
+    win.document.write(`
+        <html>
+        <head>
+            <title>Stock Report</title>
+        </head>
+        <body>
+            <h2>CASA LAKE VIEW RESORT</h2>
+            <h3>Stock Report</h3>
+            ${content}
+        </body>
+        </html>
+    `);
+
+    win.document.close();
+
+    setTimeout(() => {
+
+        win.print();
+
+    }, 500);
+}
+
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js")
     .then(() => console.log("Service Worker Registered"))
@@ -2445,6 +2499,33 @@ border-radius:5px;
 cursor:pointer;
 ">
 View Stock
+</button>
+
+<br><br>
+
+<button onclick="printStockReport()"
+style="
+padding:10px 20px;
+background:#3498db;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
+margin-right:10px;
+">
+🖨️ Print Stock Report
+</button>
+
+<button onclick="saveStockPDF()"
+style="
+padding:10px 20px;
+background:#e67e22;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
+">
+📄 Save PDF
 </button>
 
 <div id="stock-container" style="margin-top:20px;"></div>
