@@ -1,4 +1,3 @@
-Vu
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1189,33 +1188,41 @@ function resetSystem() {
 
     if (!confirmReset) return;
 
+    // 1. Clear all table orders
     Object.keys(tableOrders).forEach(table => {
         tableOrders[table] = [];
     });
 
+    // 2. Clear completed orders
     endOfDayOrders = [];
 
+    // 3. Clear order numbers
     Object.keys(tableOrderNumbers).forEach(table => {
         delete tableOrderNumbers[table];
     });
 
-   
+    // 4. Reset localStorage (ONLY cleanup, no redeclaration)
     localStorage.removeItem("endOfDayOrders");
     localStorage.removeItem("tableOrderNumbers");
+    localStorage.removeItem("totalTablesCount");
 
-localStorage.removeItem("totalTablesCount");
+    // 5. Reset table count safely
+    totalTablesCount = 10;
 
-totalTablesCount = 10;
+    // 6. Save fresh state (IMPORTANT)
+    localStorage.setItem("tableOrders", JSON.stringify(tableOrders));
+    localStorage.setItem("tableOrderNumbers", JSON.stringify(tableOrderNumbers));
 
+    // 7. Refresh UI
     updateReceiptDisplay();
     updateTableIndicators();
     generateEndOfDayReport();
 
     alert("System reset successfully.");
 
-location.reload();
-
+    location.reload();
 }
+
     
 const tableOrders =
 JSON.parse(localStorage.getItem("tableOrders")) || {
