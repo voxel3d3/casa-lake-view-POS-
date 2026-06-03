@@ -1,3 +1,4 @@
+Vu
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1154,6 +1155,8 @@ const staffAccounts = [
 
 function loginUser() {
 
+    alert("LOGIN BUTTON CLICKED");
+
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value.trim();
 
@@ -1172,7 +1175,6 @@ function loginUser() {
     sessionStorage.setItem("loggedIn", "true");
 
     document.getElementById("login-screen").style.display = "none";
-    document.body.style.overflow = "auto";
 }
 
 function resetSystem() {
