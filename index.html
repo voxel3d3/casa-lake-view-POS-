@@ -416,19 +416,19 @@ Vu
             style="width:100%; padding:10px; margin-bottom:15px;"
         >
 
-        <button
-    onclick="alert('BUTTON WORKING')"
-            style="
-                width:100%;
-                padding:10px;
-                background:#27ae60;
-                color:white;
-                border:none;
-                cursor:pointer;
-            "
-        >
-            LOGIN
-        </button>
+       <button
+    onclick="loginUser()"
+    style="
+        width:100%;
+        padding:10px;
+        background:#27ae60;
+        color:white;
+        border:none;
+        cursor:pointer;
+    "
+>
+    LOGIN
+</button>
 
     </div>
 
@@ -1155,7 +1155,7 @@ const staffAccounts = [
 
 function loginUser() {
 
-    alert("LOGIN BUTTON CLICKED");
+    alert("LOGIN FUNCTION RUNNING");
 
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value.trim();
@@ -1175,6 +1175,10 @@ function loginUser() {
     sessionStorage.setItem("loggedIn", "true");
 
     document.getElementById("login-screen").style.display = "none";
+
+    document.body.style.overflow = "auto";
+
+    alert("LOGIN SUCCESS");
 }
 
 function resetSystem() {
