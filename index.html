@@ -1763,6 +1763,20 @@ commands.push(`Date: ${dateStr} ${timestamp}\n`);
 
         totalBill += itemTotal;
 
+// UPDATE STOCK SOLD
+
+if(stockItems[item.name]){
+
+    stockItems[item.name].sold += item.qty;
+
+    calculateClosingStock(item.name);
+
+    localStorage.setItem(
+        "stockItems",
+        JSON.stringify(stockItems)
+    );
+}
+
         commands.push(`${item.name}\n`);
 
         commands.push(
