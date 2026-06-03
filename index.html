@@ -1099,6 +1099,38 @@ let tableOrderNumbers =
 let endOfDayOrders =
     JSON.parse(localStorage.getItem("endOfDayOrders")) || [];
 
+let stockItems =
+JSON.parse(localStorage.getItem("stockItems")) || {
+
+    "Can Coke": {
+        opening: 50,
+        added: 0,
+        damaged: 0,
+        complimentary: 0,
+        sold: 0,
+        closing: 50
+    },
+
+    "Bottle Water": {
+        opening: 100,
+        added: 0,
+        damaged: 0,
+        complimentary: 0,
+        sold: 0,
+        closing: 100
+    },
+
+    "Club Beer": {
+        opening: 40,
+        added: 0,
+        damaged: 0,
+        complimentary: 0,
+        sold: 0,
+        closing: 40
+    }
+
+};
+
 // --- THE BRIDGE: Connects the popup to your printer ---
 
 function showModal(callback) {
@@ -1995,6 +2027,23 @@ function changeQty(itemName, change) {
 
     updateReceiptDisplay();
     updateTableIndicators();
+}
+
+function calculateClosingStock(itemName){
+
+    const stock = stockItems[itemName];
+
+    stock.closing =
+        stock.opening +
+        stock.added -
+        stock.damaged -
+        stock.complimentary -
+        stock.sold;
+
+    localStorage.setItem(
+        "stockItems",
+        JSON.stringify(stockItems)
+    );
 }
 
         function updateReceiptDisplay() {
