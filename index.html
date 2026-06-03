@@ -2419,25 +2419,26 @@ async function printStockReport() {
 
 function saveStockPDF() {
 
-    let doc = new jspdf.jsPDF(
-        "landscape",
-        "mm",
-        "a4"
-    );
+    const { jsPDF } = window.jspdf;
+
+    let doc = new jsPDF("landscape");
 
     doc.setFontSize(18);
-    doc.text("CASA LAKE VIEW RESORT", 14, 15);
+    doc.text("CASA LAKE VIEW RESORT", 15, 15);
 
     doc.setFontSize(12);
-    doc.text("Stock Report", 14, 25);
+    doc.text("Stock Report", 15, 25);
 
     let y = 40;
 
-    doc.text(
-        "Item | Opening | Added | Damaged | Complimentary | Sold | Closing",
-        14,
-        y
-    );
+    // Header row
+    doc.text("Item", 15, y);
+    doc.text("Opening", 60, y);
+    doc.text("Added", 90, y);
+    doc.text("Damaged", 120, y);
+    doc.text("Compl.", 150, y);
+    doc.text("Sold", 180, y);
+    doc.text("Closing", 210, y);
 
     y += 10;
 
@@ -2445,12 +2446,15 @@ function saveStockPDF() {
 
         let s = stockItems[item];
 
-        let row =
-            `${item} | ${s.opening} | ${s.added} | ${s.damaged} | ${s.complimentary} | ${s.sold} | ${s.closing}`;
+        doc.text(item, 15, y);
+        doc.text(String(s.opening), 60, y);
+        doc.text(String(s.added), 90, y);
+        doc.text(String(s.damaged), 120, y);
+        doc.text(String(s.complimentary), 150, y);
+        doc.text(String(s.sold), 180, y);
+        doc.text(String(s.closing), 210, y);
 
-        doc.text(row, 14, y);
-
-        y += 8;
+        y += 10;
     }
 
     doc.save("Stock_Report.pdf");
