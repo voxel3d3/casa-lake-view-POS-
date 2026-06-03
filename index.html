@@ -1102,6 +1102,49 @@ let endOfDayOrders =
 
 // --- THE BRIDGE: Connects the popup to your printer ---
 
+function showModal(callback) {
+
+    const modal = document.getElementById("print-modal");
+
+    modal.style.display = "flex";
+
+    const oldButton =
+        document.getElementById("confirm-print-btn");
+
+    if (oldButton) {
+        oldButton.remove();
+    }
+
+    const printBtn = document.createElement("button");
+
+    printBtn.id = "confirm-print-btn";
+
+    printBtn.innerText = "PRINT";
+
+    printBtn.style.width = "100%";
+    printBtn.style.padding = "10px";
+    printBtn.style.marginTop = "10px";
+    printBtn.style.background = "#27ae60";
+    printBtn.style.color = "white";
+    printBtn.style.border = "none";
+    printBtn.style.cursor = "pointer";
+
+    printBtn.onclick = () => {
+
+        const waiterName =
+            document.getElementById("staff-name-input").value;
+
+        const paymentMethod =
+            document.getElementById("payment-method-select").value;
+
+        modal.style.display = "none";
+
+        callback(waiterName, paymentMethod);
+    };
+
+    modal.querySelector("div").appendChild(printBtn);
+}
+
 function openKitchenPreview() {
     showModal((name, method) =>
         printKitchenOrder(name, method, currentLoggedInStaff)
