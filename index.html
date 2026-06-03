@@ -1083,6 +1083,8 @@
         </div>
     </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
     <script> 
 
  let totalTablesCount =
@@ -2427,33 +2429,28 @@ function printStockReport() {
     }, 500);
 }
 
-function saveStockPDF(){
+function saveStockPDF() {
 
     let content =
-        document.getElementById("stock-container").innerHTML;
+        document.getElementById("stock-container").innerText;
 
-    let win = window.open("", "", "width=900,height=700");
+    const { jsPDF } = window.jspdf;
 
-    win.document.write(`
-        <html>
-        <head>
-            <title>Stock Report</title>
-        </head>
-        <body>
-            <h2>CASA LAKE VIEW RESORT</h2>
-            <h3>Stock Report</h3>
-            ${content}
-        </body>
-        </html>
-    `);
+    let doc = new jsPDF();
 
-    win.document.close();
+    doc.setFontSize(18);
+    doc.text("CASA LAKE VIEW RESORT", 10, 15);
 
-    setTimeout(() => {
+    doc.setFontSize(14);
+    doc.text("Stock Report", 10, 25);
 
-        win.print();
+    let lines =
+        doc.splitTextToSize(content, 180);
 
-    }, 500);
+    doc.setFontSize(10);
+    doc.text(lines, 10, 40);
+
+    doc.save("Stock_Report.pdf");
 }
 
 if ("serviceWorker" in navigator) {
