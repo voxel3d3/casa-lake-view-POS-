@@ -2371,62 +2371,50 @@ async function printEndOfDayReport() {
     alert("End of Day Report Printed Successfully.");
 }
 
-function printStockReport() {
+async function printStockReport() {
 
-    let reportSection = document.getElementById("stock-section");
+    const dateStr = new Date().toLocaleDateString();
+    const timestamp = new Date().toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
 
-    if (!reportSection) {
-        alert("Stock report section not found.");
-        return;
+    let commands = [];
+
+    commands.push(ESC_INIT);
+
+    commands.push(
+        ESC_CENTER,
+        ESC_BOLD_ON,
+        "CASA LAKE VIEW RESORT\n",
+        "STOCK REPORT\n",
+        ESC_BOLD_OFF
+    );
+
+    commands.push("--------------------------------\n");
+    commands.push(`Date: ${dateStr} ${timestamp}\n`);
+    commands.push("--------------------------------\n");
+
+    commands.push(ESC_LEFT);
+
+    for (let item in stockItems) {
+
+        let s = stockItems[item];
+
+        commands.push(`${item}\n`);
+        commands.push(`Opening: ${s.opening}\n`);
+        commands.push(`Added: ${s.added}\n`);
+        commands.push(`Damaged: ${s.damaged}\n`);
+        commands.push(`Complimentary: ${s.complimentary}\n`);
+        commands.push(`Sold: ${s.sold}\n`);
+        commands.push(`Closing: ${s.closing}\n`);
+        commands.push("--------------------------------\n");
     }
 
-    let printWindow = window.open("", "_blank");
+    commands.push("\n\n\n");
+    commands.push(ESC_FEED_AND_CUT);
 
-    printWindow.document.write(`
-        <html>
-        <head>
-            <title>Stock Report</title>
-            <style>
-                body{
-                    font-family: Arial, sans-serif;
-                    padding:20px;
-                }
-
-                table{
-                    width:100%;
-                    border-collapse:collapse;
-                    margin-top:10px;
-                }
-
-                th,td{
-                    border:1px solid #000;
-                    padding:8px;
-                    text-align:left;
-                }
-
-                th{
-                    background:#f2f2f2;
-                }
-
-                h2{
-                    text-align:center;
-                }
-            </style>
-        </head>
-
-        <body>
-            <h2>Stock Report</h2>
-            ${reportSection.innerHTML}
-        </body>
-        </html>
-    `);
-
-    printWindow.document.close();
-
-    setTimeout(function () {
-        printWindow.focus();
-        printWindow.print();
-    }, 500);
+    await sendRawToUsbPrinter(commands);
 }
 
 function saveStockPDF() {
