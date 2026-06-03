@@ -1177,8 +1177,8 @@ function loginUser() {
     const loginScreen = document.getElementById("login-screen");
 
     if (loginScreen) {
-        loginScreen.style.display = "none";
-    } else {
+    loginScreen.remove();
+} else {
         alert("ERROR: login-screen not found in HTML");
     }
 
@@ -1232,21 +1232,6 @@ function resetSystem() {
 }
 
     
-const tableOrders =
-JSON.parse(localStorage.getItem("tableOrders")) || {
-        'T1': [], 'T2': [], 'T3': [], 'T4': [], 'T5': [],
-        'T6': [], 'T7': [], 'T8': [], 'T9': [], 'T10': []
-    };
-
-const tableOrderNumbers =
-    JSON.parse(localStorage.getItem("tableOrderNumbers")) || {};
-
-        // Stores completed paid orders
-
-let endOfDayOrders = JSON.parse(localStorage.getItem("endOfDayOrders")) || [];
-
-       
-        let currentTable = 'T1';
 
         let currentMainMode = 'foods';
         let currentFoodSubTab = 'breakfast';
