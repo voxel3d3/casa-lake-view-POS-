@@ -1165,7 +1165,8 @@ function openPendingBillPreview() {
 
 // CURRENT LOGGED IN STAFF
 
-let currentLoggedInStaff = "Admin";
+let currentLoggedInStaff =
+    sessionStorage.getItem("staffName") || "";
 
 // POS STAFF ACCOUNTS
 const staffAccounts = [
