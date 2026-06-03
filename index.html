@@ -1165,6 +1165,82 @@ JSON.parse(localStorage.getItem("stockItems")) || {
     "Azul": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0}
 };
 
+// AUTO-UPDATE STOCK LIST
+
+const defaultStockItems = {
+
+    "Bottle Water": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Aqua Panna Water": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "750ml Bel-Aqua": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "330ml Bel-Aqua": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Tonic Water": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Can Coke": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Can Sprite": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Can Fanta": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Ceres": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Alvaro": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Frutelli": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Vitamilk": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Walch": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Coca Cola 1L": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+
+    "Rox": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Blue Jeans": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+
+    "Ace of Spade": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Moet Nectar Imperial Rose": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Veuve Cliquot Brut Rose": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Bellaire Rose": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Bellaire Luxe": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "La Roche": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "JP Chenet": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Mosketto": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Four Special Wine": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+
+    "Club Beer": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Club Shandy": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Origin Beer": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Heineken Beer": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Fax Beer": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Guinness": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Smirnoff Punch": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Smirnoff Black": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Savanna": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Hunters": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Gulder": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Eagle Black": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Eagle White": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+
+    "Hennessy VSOP Bottle": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Hennessy VS Big Bottle": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Hennessy VS Small Bottle": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Glenmorangie 12yrs": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Black Label": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Red Label": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Baileys 700ml": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Jagermeister 1.75L": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Jack Daniels": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Jim Beam": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Skyy Vodka": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+    "Azul": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0}
+};
+
+// Add any missing items automatically
+
+for (let item in defaultStockItems) {
+
+    if (!stockItems[item]) {
+
+        stockItems[item] = defaultStockItems[item];
+
+    }
+}
+
+localStorage.setItem(
+    "stockItems",
+    JSON.stringify(stockItems)
+);
+
 // --- THE BRIDGE: Connects the popup to your printer ---
 
 function showModal(callback) {
