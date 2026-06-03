@@ -1207,13 +1207,41 @@ const s = stockItems[item];
 
 html += `
 <tr>
+
 <td>${item}</td>
-<td>${s.opening}</td>
-<td>${s.added}</td>
-<td>${s.damaged}</td>
-<td>${s.complimentary}</td>
+
+<td>
+<input type="number"
+value="${s.opening}"
+onchange="updateStock('${item}','opening',this.value)"
+style="width:70px;">
+</td>
+
+<td>
+<input type="number"
+value="${s.added}"
+onchange="updateStock('${item}','added',this.value)"
+style="width:70px;">
+</td>
+
+<td>
+<input type="number"
+value="${s.damaged}"
+onchange="updateStock('${item}','damaged',this.value)"
+style="width:70px;">
+</td>
+
+<td>
+<input type="number"
+value="${s.complimentary}"
+onchange="updateStock('${item}','complimentary',this.value)"
+style="width:70px;">
+</td>
+
 <td>${s.sold}</td>
+
 <td>${s.closing}</td>
+
 </tr>
 `;
 }
@@ -1221,7 +1249,6 @@ html += `
 html += "</table>";
 
 document.getElementById("stock-container").innerHTML = html;
-
 }
 
 function openPaymentPreview() {
@@ -2086,6 +2113,21 @@ function calculateClosingStock(itemName){
         "stockItems",
         JSON.stringify(stockItems)
     );
+}
+
+function updateStock(itemName, field, value){
+
+    stockItems[itemName][field] =
+        parseInt(value) || 0;
+
+    calculateClosingStock(itemName);
+
+    localStorage.setItem(
+        "stockItems",
+        JSON.stringify(stockItems)
+    );
+
+    showStockPage();
 }
 
         function updateReceiptDisplay() {
