@@ -459,6 +459,8 @@
 
 <button class="sub-tab-btn" onclick="switchFoodSubTab('kids-meal')">Kids Meal</button>
 
+<button class="sub-tab-btn" onclick="switchFoodSubTab('extras')">EXTRAS</button>
+
 <button class="sub-tab-btn" onclick="switchFoodSubTab('servers')">SERVERS</button>
 
 <button class="sub-tab-btn" onclick="switchFoodSubTab('alhaji-package')">Alhaji Package</button>
@@ -687,6 +689,35 @@
     <div class="item-card" data-category="food" onclick="addToOrder('Fried Rice for Kids', 50)">
         <span class="item-name">Fried Rice for Kids</span>
         <span class="item-price">GHS 50</span>
+    </div>
+
+</div>
+
+<div id="extras" class="grid-container food-grid">
+
+    <div class="item-card" data-category="food" onclick="addToOrder('Banku', 5)">
+        <span class="item-name">Banku</span>
+        <span class="item-price">GHS 5</span>
+    </div>
+
+    <div class="item-card" data-category="food" onclick="addToOrder('Packaging', 5)">
+        <span class="item-name">Packaging</span>
+        <span class="item-price">GHS 5</span>
+    </div>
+
+    <div class="item-card" data-category="food" onclick="addToOrder('Extra Cheese', 25)">
+        <span class="item-name">Extra Cheese</span>
+        <span class="item-price">GHS 25</span>
+    </div>
+
+    <div class="item-card" data-category="food" onclick="addToOrder('Red Snapper', 50)">
+        <span class="item-name">Red Snapper</span>
+        <span class="item-price">GHS 50</span>
+    </div>
+
+    <div class="item-card" data-category="food" onclick="addToOrder('Tilapia', 150)">
+        <span class="item-name">Tilapia</span>
+        <span class="item-price">GHS 150</span>
     </div>
 
 </div>
@@ -1115,6 +1146,10 @@ JSON.parse(localStorage.getItem("stockItems")) || {
     "Can Fanta": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
     "Ceres": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
     "Alvaro": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+"Malt": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+"BB Cocktail": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+"Don-Simon": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
+"Tampico": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
     "Frutelli": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
     "Vitamilk": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
     "Walch": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
