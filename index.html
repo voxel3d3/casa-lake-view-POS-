@@ -2305,41 +2305,37 @@ const activeOrderArray = tableOrders[currentTable];
 
     item.qty += change;
 
-    // REMOVE ITEM IF QTY BECOMES ZERO
-    if (item.qty <= 0) {
-
-        tableOrders[currentTable] =
-            activeOrderArray.filter(
-                i => i.name !== itemName
-            );
-    }
-
-    // SAVE UPDATED ORDERS
-    localStorage.setItem(
-        "tableOrders",
-        JSON.stringify(tableOrders)
-    );
-
-// REMOVE ZERO QUANTITY ITEMS FIRST
+    // REMOVE ZERO QTY ITEMS FIRST (CLEAN ORDER)
 const cleanedOrders = activeOrderArray.filter(item => item.qty > 0);
 
-// UPDATE FIREBASE
+// UPDATE LOCAL STORAGE
+tableOrders[currentTable] = cleanedOrders;
+
+localStorage.setItem(
+    "tableOrders",
+    JSON.stringify(tableOrders)
+);
+
+// UPDATE FIREBASE (LIVE ORDERS ONLY)
+const docRef = db.collection("liveOrders").doc(currentTable);
+
 if (cleanedOrders.length === 0) {
 
-    db.collection("liveOrders")
-      .doc(currentTable)
-      .delete();
+    // ONLY DELETE WHEN TABLE IS EMPTY (NOT PAYMENT)
+    docRef.delete();
 
 } else {
 
-    db.collection("liveOrders")
-      .doc(currentTable)
-      .update({
-          orders: cleanedOrders
-      });
+    // KEEP TABLE LIVE WITH CLEAN DATA
+    docRef.set({
+        table: currentTable,
+        orders: cleanedOrders,
+        updatedAt: new Date().toISOString()
+    }, { merge: true });
 
 }
 
+// UI UPDATES
 updateReceiptDisplay();
 updateTableIndicators();
 
