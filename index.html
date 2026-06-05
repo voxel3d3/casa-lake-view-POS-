@@ -2320,26 +2320,29 @@ const activeOrderArray = tableOrders[currentTable];
         JSON.stringify(tableOrders)
     );
 
-// UPDATE FIREBASE
+// REMOVE ZERO QUANTITY ITEMS FIRST
+const cleanedOrders = activeOrderArray.filter(item => item.qty > 0);
 
-if(activeOrderArray.length === 0){
+// UPDATE FIREBASE
+if (cleanedOrders.length === 0) {
 
     db.collection("liveOrders")
       .doc(currentTable)
       .delete();
 
-}else{
+} else {
 
     db.collection("liveOrders")
       .doc(currentTable)
       .update({
-          orders: activeOrderArray
+          orders: cleanedOrders
       });
 
 }
 
-    updateReceiptDisplay();
-    updateTableIndicators();
+updateReceiptDisplay();
+updateTableIndicators();
+
 }
 
 function syncTableToFirebase(tableName) {
