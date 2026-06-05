@@ -32,5 +32,26 @@
 Loading...
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+<script>
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBrsJteLnC0AJsqQN2EDD07vXQX4MBveQk",
+  authDomain: "casa-lake-view-resort.firebaseapp.com",
+  projectId: "casa-lake-view-resort",
+  storageBucket: "casa-lake-view-resort.firebasestorage.app",
+  messagingSenderId: "783691618625",
+  appId: "1:783691618625:web:fe6bf67bb4585947ce69c0",
+  measurementId: "G-2SLSV010SB"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.firestore();
+
+</script>
+
 </body>
 </html>
