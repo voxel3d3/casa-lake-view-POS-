@@ -1,3 +1,5 @@
+Managers.html
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -50,6 +52,54 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 const db = firebase.firestore();
+
+<script>
+
+db.collection("liveOrders")
+.onSnapshot((snapshot) => {
+
+    const dashboard =
+        document.getElementById("dashboard");
+
+    dashboard.innerHTML = "";
+
+    snapshot.forEach((doc) => {
+
+        const data = doc.data();
+
+        let ordersHTML = "";
+
+        if (data.orders) {
+
+            data.orders.forEach(order => {
+
+                ordersHTML += `
+                    <li>
+                        ${order.name}
+                        x${order.qty}
+                        - ${order.createdBy}
+                    </li>
+                `;
+
+            });
+        }
+
+        dashboard.innerHTML += `
+            <div class="table-card">
+
+                <h2>Table ${doc.id}</h2>
+
+                <ul>
+                    ${ordersHTML}
+                </ul>
+
+            </div>
+        `;
+    });
+
+});
+
+</script>
 
 </script>
 
