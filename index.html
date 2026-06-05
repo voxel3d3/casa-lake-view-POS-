@@ -2320,6 +2320,25 @@ const activeOrderArray = tableOrders[currentTable];
         JSON.stringify(tableOrders)
     );
 
+// UPDATE FIREBASE
+const activeOrderArray = tableOrders[currentTable];
+
+if(activeOrderArray.length === 0){
+
+    db.collection("liveOrders")
+      .doc(currentTable)
+      .delete();
+
+}else{
+
+    db.collection("liveOrders")
+      .doc(currentTable)
+      .update({
+          orders: activeOrderArray
+      });
+
+}
+
     updateReceiptDisplay();
     updateTableIndicators();
 }
