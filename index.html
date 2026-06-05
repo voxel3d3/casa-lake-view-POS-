@@ -2049,6 +2049,10 @@ tableOrders[currentTable] = [];
 
 delete tableOrderNumbers[currentTable];
 
+db.collection("liveOrders")
+  .doc(currentTable)
+  .delete();
+
 // SAVE UPDATED TABLE ORDERS
 localStorage.setItem(
     "tableOrders",
