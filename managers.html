@@ -28,6 +28,20 @@
 
 <h1>Live Orders Dashboard</h1>
 
+<button onclick="clearDashboard()"
+style="
+padding:10px 20px;
+background:#e74c3c;
+color:white;
+border:none;
+border-radius:6px;
+cursor:pointer;
+margin-bottom:20px;
+font-weight:bold;
+">
+🗑 Clear Dashboard
+</button>
+
 <div id="dashboard">
 Loading...
 </div>
@@ -50,6 +64,30 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 const db = firebase.firestore();
+
+function clearDashboard() {
+
+    if(!confirm(
+        "Are you sure you want to clear all dashboard records?"
+    )){
+        return;
+    }
+
+    db.collection("liveOrders")
+    .get()
+    .then((snapshot) => {
+
+        snapshot.forEach((doc) => {
+
+            doc.ref.delete();
+
+        });
+
+        alert("Dashboard cleared.");
+
+    });
+
+}
 
 db.collection("liveOrders")
 .onSnapshot((snapshot) => {
