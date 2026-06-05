@@ -2044,10 +2044,40 @@ await sendRawToUsbPrinter(commands);
 
 alert("Payment bill printed successfully.");
 
+const paidOrders = JSON.parse(JSON.stringify(tableOrders[currentTable] || []));
+
 // CLEAR CURRENT TABLE AFTER PAYMENT
+
+const paidOrders = JSON.parse(JSON.stringify(tableOrders[currentTable] || []));
+
+db.collection("completedOrders").add({
+
+    table: currentTable,
+    orders: paidOrders,
+    total: totalBill,
+    paymentMethod: method,
+    waiter: waiterName,
+    operator: operatorName,
+    paidAt: new Date().toISOString()
+
+});
+
+// CLEAR ONLY AFTER SAVING
 tableOrders[currentTable] = [];
 
 delete tableOrderNumbers[currentTable];
+
+db.collection("liveOrders")
+  .doc(currentTable)
+  .delete();
+
+    total: totalBill,
+    paymentMethod: method,
+    waiter: waiterName,
+    operator: operatorName,
+    paidAt: new Date().toISOString()
+
+});
 
 db.collection("liveOrders")
   .doc(currentTable)
