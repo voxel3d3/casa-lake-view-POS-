@@ -1120,6 +1120,8 @@
 
     <script> 
 
+let db = null;
+
  let totalTablesCount =
     parseInt(localStorage.getItem("totalTablesCount")) || 10;
 
@@ -1127,6 +1129,15 @@ let currentTable = 'T1';
 
 let tableOrders =
     JSON.parse(localStorage.getItem("tableOrders")) || {};
+
+for(let i = 1; i <= totalTablesCount; i++) {
+
+    const tableName = "T" + i;
+
+    if(!tableOrders[tableName]) {
+        tableOrders[tableName] = [];
+    }
+}
 
 let tableOrderNumbers =
     JSON.parse(localStorage.getItem("tableOrderNumbers")) || {};
@@ -2209,7 +2220,11 @@ localStorage.setItem(
 
        function addToOrder(name, price) {
 
-    const activeOrderArray = tableOrders[currentTable];
+    if (!tableOrders[currentTable]) {
+    tableOrders[currentTable] = [];
+}
+
+const activeOrderArray = tableOrders[currentTable];
 
     // CREATE ORDER NUMBER IF TABLE HAS NONE
     if (!tableOrderNumbers[currentTable]) {
@@ -2259,19 +2274,26 @@ localStorage.setItem(
 
     // SAVE TO LOCAL STORAGE
     localStorage.setItem(
-        "tableOrders",
-        JSON.stringify(tableOrders)
-    );
+    "tableOrders",
+    JSON.stringify(tableOrders)
+);
 
-    // REFRESH SCREEN
-    updateReceiptDisplay();
-    updateTableIndicators();
+// SEND TO FIREBASE
+syncTableToFirebase(currentTable);
+
+// REFRESH SCREEN
+updateReceiptDisplay();
+updateTableIndicators();
 }
 
 /* THIS FUNCTION MUST BE OUTSIDE addToOrder */
 function changeQty(itemName, change) {
 
-    const activeOrderArray = tableOrders[currentTable];
+    if (!tableOrders[currentTable]) {
+    tableOrders[currentTable] = [];
+}
+
+const activeOrderArray = tableOrders[currentTable];
 
     const item = activeOrderArray.find(
         i => i.name === itemName
@@ -2298,6 +2320,22 @@ function changeQty(itemName, change) {
 
     updateReceiptDisplay();
     updateTableIndicators();
+}
+
+function syncTableToFirebase(tableName) {
+
+    db.collection("liveOrders")
+      .doc(tableName)
+      .set({
+
+          table: tableName,
+
+          orders: tableOrders[tableName],
+
+          updatedAt: new Date().toISOString()
+
+      });
+
 }
 
 function checkSalesHistory() {
@@ -2398,33 +2436,70 @@ function updateStock(itemName, field, value){
 }
 
         function updateReceiptDisplay() {
-            const container = document.getElementById('receipt-items-container');
-            container.innerHTML = '';
-            let total = 0;
-            const activeOrderArray = tableOrders[currentTable];
 
-            activeOrderArray.forEach(item => {
-                const itemTotal = item.price * item.qty;
-                total += itemTotal;
+    const container =
+        document.getElementById('receipt-items-container');
 
-                const row = document.createElement('div');
-                row.className = 'receipt-row';
-                row.innerHTML = `
-                    <div class="receipt-item-details">
-                        <div><strong>${item.name}</strong></div>
-                        <div class="qty-controls">
-                            <button class="qty-btn" onclick="changeQty('${item.name}', -1)">-</button>
-                            <span>${item.qty}</span>
-                            <button class="qty-btn" onclick="changeQty('${item.name}', 1)">+</button>
-                        </div>
-                    </div>
-                    <div class="receipt-item-price">GHS ${itemTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-                `;
-                container.appendChild(row);
-            });
+    container.innerHTML = '';
 
-            document.getElementById('grand-total').innerText = `GHS ${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-        } function generateEndOfDayReport() {
+    let total = 0;
+
+    // SAFETY CHECK
+    if (!tableOrders[currentTable]) {
+        tableOrders[currentTable] = [];
+    }
+
+    const activeOrderArray =
+        tableOrders[currentTable];
+
+    activeOrderArray.forEach(item => {
+
+        const itemTotal =
+            item.price * item.qty;
+
+        total += itemTotal;
+
+        const row =
+            document.createElement('div');
+
+        row.className = 'receipt-row';
+
+        row.innerHTML = `
+            <div class="receipt-item-details">
+                <div><strong>${item.name}</strong></div>
+
+                <div class="qty-controls">
+                    <button class="qty-btn"
+                        onclick="changeQty('${item.name}', -1)">
+                        -
+                    </button>
+
+                    <span>${item.qty}</span>
+
+                    <button class="qty-btn"
+                        onclick="changeQty('${item.name}', 1)">
+                        +
+                    </button>
+                </div>
+            </div>
+
+            <div class="receipt-item-price">
+                GHS ${itemTotal.toLocaleString(
+                    'en-US',
+                    {minimumFractionDigits: 2}
+                )}
+            </div>
+        `;
+
+        container.appendChild(row);
+    });
+
+    document.getElementById('grand-total').innerText =
+        `GHS ${total.toLocaleString(
+            'en-US',
+            {minimumFractionDigits: 2}
+        )}`;
+} function generateEndOfDayReport() {
 
     const reportContainer = document.getElementById('report-container');
 
@@ -2918,5 +2993,26 @@ cursor:pointer;
 <div id="stock-container" style="margin-top:20px;"></div>
 
 </div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBrsJteLnC0AJsqQN2EDD07vXQX4MBveQk",
+  authDomain: "casa-lake-view-resort.firebaseapp.com",
+  projectId: "casa-lake-view-resort",
+  storageBucket: "casa-lake-view-resort.firebasestorage.app",
+  messagingSenderId: "783691618625",
+  appId: "1:783691618625:web:fe6bf67bb4585947ce69c0",
+  measurementId: "G-2SLSV010SB"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.firestore();
+</script>
+
 </body>
 </html>
