@@ -1116,6 +1116,8 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script> 
 
  let totalTablesCount =
@@ -1131,6 +1133,9 @@ let tableOrderNumbers =
 
 let endOfDayOrders =
     JSON.parse(localStorage.getItem("endOfDayOrders")) || [];
+
+let salesHistory =
+JSON.parse(localStorage.getItem("salesHistory")) || [];
 
 let stockItems =
 JSON.parse(localStorage.getItem("stockItems")) || {
@@ -1968,6 +1973,25 @@ if(stockItems[item.name]){
 
 });
 
+salesHistory.push({
+
+    item: item.name,
+    category: item.category,
+    qty: item.qty,
+    price: item.price,
+    total: itemTotal,
+
+    waiter: waiterName,
+
+    time: new Date().toISOString()
+
+});
+
+localStorage.setItem(
+    "salesHistory",
+    JSON.stringify(salesHistory)
+);
+
 localStorage.setItem(
     "endOfDayOrders",
     JSON.stringify(endOfDayOrders)
@@ -2276,6 +2300,71 @@ function changeQty(itemName, change) {
     updateTableIndicators();
 }
 
+function checkSalesHistory() {
+
+    console.log(salesHistory);
+
+    alert(
+        "Sales records saved: " +
+        salesHistory.length
+    );
+
+}
+
+function showSalesGraph() {
+
+    let salesHistory =
+        JSON.parse(localStorage.getItem("salesHistory")) || [];
+
+    if(salesHistory.length === 0){
+        alert("No sales data available.");
+        return;
+    }
+
+    let hourlySales = {};
+
+    salesHistory.forEach(sale => {
+
+        let hour =
+            new Date(sale.time).getHours();
+
+        if(!hourlySales[hour]){
+            hourlySales[hour] = 0;
+        }
+
+        hourlySales[hour] += sale.total;
+
+    });
+
+    let labels = Object.keys(hourlySales)
+        .sort((a,b)=>a-b);
+
+    let data = labels.map(hour =>
+        hourlySales[hour]
+    );
+
+    document.getElementById(
+        "graphContainer"
+    ).style.display = "block";
+
+    const ctx =
+        document.getElementById("salesChart");
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels.map(h => h + ":00"),
+            datasets: [{
+                label: 'Sales (GHS)',
+                data: data,
+                fill: false,
+                tension: 0.3
+            }]
+        }
+    });
+
+}
+
 function calculateClosingStock(itemName){
 
     const stock = stockItems[itemName];
@@ -2349,9 +2438,38 @@ function updateStock(itemName, field, value){
 
     let grandTotal = 0;
 
+let foodSales = {};
+let drinkSales = {};
+let waiterSales = {};
+
     endOfDayOrders.forEach(order => {
 
         grandTotal += order.total;
+
+// Track waiter sales
+if (!waiterSales[order.waiter]) {
+    waiterSales[order.waiter] = 0;
+}
+waiterSales[order.waiter] += order.total;
+
+// Track item popularity
+if (order.category === "food") {
+
+    if (!foodSales[order.item]) {
+        foodSales[order.item] = 0;
+    }
+
+    foodSales[order.item] += order.qty;
+
+} else {
+
+    if (!drinkSales[order.item]) {
+        drinkSales[order.item] = 0;
+    }
+
+    drinkSales[order.item] += order.qty;
+
+}
 
         const row = `
             <tr>
@@ -2370,6 +2488,18 @@ function updateStock(itemName, field, value){
         }
 
     });
+
+let bestFood =
+Object.keys(foodSales)
+.sort((a,b) => foodSales[b] - foodSales[a])[0];
+
+let bestDrink =
+Object.keys(drinkSales)
+.sort((a,b) => drinkSales[b] - drinkSales[a])[0];
+
+let topWaiter =
+Object.keys(waiterSales)
+.sort((a,b) => waiterSales[b] - waiterSales[a])[0];
 
     reportContainer.innerHTML = `
 
@@ -2404,8 +2534,25 @@ function updateStock(itemName, field, value){
         </table>
 
         <div style="margin-top:25px; font-size:22px; font-weight:bold; color:#1a3a5f;">
-            GRAND TOTAL: GHS ${grandTotal.toFixed(2)}
-        </div>
+    GRAND TOTAL: GHS ${grandTotal.toFixed(2)}
+</div>
+
+<div style="
+margin-top:20px;
+padding:15px;
+background:#eef7ff;
+border-radius:8px;
+">
+
+<h4>🏆 Performance Summary</h4>
+
+<p><strong>Best Selling Food:</strong> ${bestFood || "N/A"}</p>
+
+<p><strong>Best Selling Drink:</strong> ${bestDrink || "N/A"}</p>
+
+<p><strong>Top Waiter:</strong> ${topWaiter || "N/A"}</p>
+
+</div>
 
         <button onclick="printEndOfDayReport()"
             style="
@@ -2689,9 +2836,34 @@ Reset Day
     <div id="report-section" style="margin-top: 40px; padding: 20px; border-top: 2px solid #ddd; background: #f9f9f9;">
     <h3>End of Day Sales Report</h3>
     <button onclick="generateEndOfDayReport()" style="padding:10px 20px; background:#3498db; color:white; border:none; cursor:pointer; border-radius:5px;">
-        Generate Report
-    </button>
-    <div id="report-container" style="margin-top: 20px;"></div>
+    Generate Report
+</button>
+
+<button onclick="showSalesGraph()"
+style="
+padding:10px 20px;
+background:#27ae60;
+color:white;
+border:none;
+cursor:pointer;
+border-radius:5px;
+margin-left:10px;
+">
+📈 Sales Trend Graph
+</button>
+
+<div id="graphContainer"
+style="
+display:none;
+background:white;
+padding:15px;
+margin-top:20px;
+border-radius:10px;
+">
+    <canvas id="salesChart"></canvas>
+</div>
+
+<div id="report-container" style="margin-top:20px;"></div>
 </div>
 
 <div id="stock-section"
