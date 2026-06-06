@@ -1,3 +1,5 @@
+Managers.html
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -27,6 +29,19 @@
 <body>
 
 <h1>Live Orders Dashboard</h1>
+
+<div id="revenueSummary"
+style="
+background:white;
+padding:15px;
+margin-bottom:20px;
+border-radius:10px;
+box-shadow:0 2px 5px rgba(0,0,0,.1);
+font-size:18px;
+font-weight:bold;
+">
+Today's Revenue: GHS 0.00
+</div>
 
 <button onclick="clearDashboard()"
 style="
@@ -144,6 +159,9 @@ db.collection("liveOrders")
 db.collection("completedOrders")
 .onSnapshot((snapshot) => {
 
+    let totalRevenue = 0;
+    let paidTables = 0;
+
     const completed =
         document.getElementById("completedDashboard");
 
@@ -152,6 +170,10 @@ db.collection("completedOrders")
     snapshot.forEach((doc) => {
 
         const data = doc.data();
+
+paidTables++;
+
+totalRevenue += Number(data.total || 0);
 
         let ordersHTML = "";
 
@@ -191,6 +213,11 @@ db.collection("completedOrders")
             </div>
         `;
     });
+document.getElementById("revenueSummary").innerHTML = `
+        Today's Revenue: GHS ${totalRevenue.toFixed(2)}
+        <br>
+        Paid Tables: ${paidTables}
+    `;
 
 });
 
