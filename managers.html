@@ -70,6 +70,17 @@ box-shadow:0 2px 5px rgba(0,0,0,.1);
 Payment Analysis Loading...
 </div>
 
+<div id="topWaiter"
+style="
+background:white;
+padding:15px;
+margin-bottom:20px;
+border-radius:10px;
+box-shadow:0 2px 5px rgba(0,0,0,.1);
+">
+🏆 Top Waiter Loading...
+</div>
+
 <button onclick="clearDashboard()"
 style="
 padding:10px 20px;
@@ -260,6 +271,8 @@ let foodMomo = 0;
 let drinksCash = 0;
 let drinksMomo = 0;
 
+let waiterSales = {};
+
     const completed =
         document.getElementById("completedDashboard");
 
@@ -277,6 +290,16 @@ console.log(data);
 paidTables++;
 
 totalRevenue += Number(data.total || 0);
+
+const waiterName =
+    data.waiter || "Unknown";
+
+if (!waiterSales[waiterName]) {
+    waiterSales[waiterName] = 0;
+}
+
+waiterSales[waiterName] +=
+    Number(data.total || 0);
 
 if(data.orders){
 
@@ -420,6 +443,46 @@ GHS ${overallTotal.toFixed(2)}
 </h2>
 
 </div>
+`;
+
+let topWaiter = "";
+let topSales = 0;
+
+for (let waiter in waiterSales) {
+
+    if (waiterSales[waiter] > topSales) {
+
+        topSales = waiterSales[waiter];
+        topWaiter = waiter;
+    }
+}
+
+document.getElementById("topWaiter").innerHTML = `
+    <div style="
+        text-align:center;
+    ">
+
+        <h2>
+            🏆 TOP WAITER / WAITRESS
+        </h2>
+
+        <h1 style="
+            color:#27ae60;
+            margin:10px 0;
+        ">
+            ${topWaiter || "No Sales Yet"}
+        </h1>
+
+        <p style="
+            font-size:18px;
+        ">
+            Total Sales:
+            <b>
+                GHS ${topSales.toFixed(2)}
+            </b>
+        </p>
+
+    </div>
 `;
 
 });
