@@ -57,6 +57,17 @@ font-weight:bold;
 Today's Revenue: GHS 0.00
 </div>
 
+<div id="paymentAnalysis"
+style="
+background:white;
+padding:15px;
+margin-bottom:20px;
+border-radius:10px;
+box-shadow:0 2px 5px rgba(0,0,0,.1);
+">
+Payment Analysis Loading...
+</div>
+
 <button onclick="clearDashboard()"
 style="
 padding:10px 20px;
@@ -191,6 +202,18 @@ db.collection("liveOrders")
 
         const data = doc.data();
 
+if(data.paymentMethod === "Cash"){
+
+    foodCash += Number(data.total || 0);
+
+}
+
+if(data.paymentMethod === "Momo"){
+
+    foodMomo += Number(data.total || 0);
+
+}
+
         let ordersHTML = "";
 
         if (data.orders) {
@@ -228,6 +251,12 @@ db.collection("completedOrders")
 
     let totalRevenue = 0;
     let paidTables = 0;
+
+let foodCash = 0;
+let foodMomo = 0;
+
+let drinksCash = 0;
+let drinksMomo = 0;
 
     const completed =
         document.getElementById("completedDashboard");
@@ -285,6 +314,17 @@ document.getElementById("revenueSummary").innerHTML = `
         <br>
         Paid Tables: ${paidTables}
     `;
+
+document.getElementById("paymentAnalysis").innerHTML = `
+    <h2>💰 PAYMENT ANALYSIS</h2>
+
+    Food Cash: GHS ${foodCash.toFixed(2)}<br>
+    Food Momo: GHS ${foodMomo.toFixed(2)}<br>
+
+    <hr>
+
+    Total: GHS ${(foodCash + foodMomo).toFixed(2)}
+`;
 
 });
 
