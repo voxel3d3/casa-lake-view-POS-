@@ -1,3 +1,5 @@
+Managers.html
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -176,6 +178,39 @@ margin-left:10px;
 ">
 📅 Start New Day
 </button>
+
+<div id="dashboardHeader"
+style="
+display:none;
+text-align:center;
+margin-bottom:20px;
+">
+
+    <img
+    src="logo.png"
+    alt="Casa Lakeview Resort"
+    style="
+    width:150px;
+    height:auto;
+    display:block;
+    margin:0 auto 10px auto;
+    ">
+
+    <h1 style="
+    margin:0;
+    color:#2c3e50;
+    ">
+        CASA LAKEVIEW RESORT
+    </h1>
+
+    <p style="
+    margin-top:5px;
+    color:#7f8c8d;
+    ">
+        Manager Dashboard
+    </p>
+
+</div>
 
 <div id="dashboard" style="display:none;">
     Loading...
@@ -652,6 +687,9 @@ function loginManager() {
 
         document.getElementById("clearPaidTablesBtn")
             .style.display = "inline-block";
+
+document.getElementById("dashboardHeader")
+    .style.display = "block";
 
         document.getElementById("dashboard")
             .style.display = "block";
