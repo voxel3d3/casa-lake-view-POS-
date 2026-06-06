@@ -1,3 +1,5 @@
+Managers.html
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -341,6 +343,11 @@ if(data.orders){
                     ${data.paidAt || ""}
                 </p>
 
+<p>
+    Waiter/Waitress:
+    <b>${data.waiter || "Not Recorded"}</b>
+</p>
+
                 <p>
                     Total:
                     GHS ${data.total || 0}
@@ -352,6 +359,7 @@ if(data.orders){
 
             </div>
         `;
+
     });
 document.getElementById("revenueSummary").innerHTML = `
         Today's Revenue: GHS ${totalRevenue.toFixed(2)}
