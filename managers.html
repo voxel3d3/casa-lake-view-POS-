@@ -258,6 +258,9 @@ let foodMomo = 0;
 let drinksCash = 0;
 let drinksMomo = 0;
 
+let drinksCash = 0;
+let drinksMomo = 0;
+
     const completed =
         document.getElementById("completedDashboard");
 
@@ -276,15 +279,42 @@ paidTables++;
 
 totalRevenue += Number(data.total || 0);
 
-if(data.paymentMethod === "Cash"){
+if(data.orders){
 
-    foodCash += Number(data.total || 0);
+    data.orders.forEach(item => {
 
-}
+        const itemTotal =
+            (item.price || 0) *
+            (item.qty || 0);
 
-if(data.paymentMethod === "Momo"){
+        const category =
+            (item.category || "").toLowerCase();
 
-    foodMomo += Number(data.total || 0);
+        if(category === "food"){
+
+            if(data.paymentMethod === "Cash"){
+                foodCash += itemTotal;
+            }
+
+            if(data.paymentMethod === "Momo"){
+                foodMomo += itemTotal;
+            }
+
+        }
+
+        if(category === "drink"){
+
+            if(data.paymentMethod === "Cash"){
+                drinksCash += itemTotal;
+            }
+
+            if(data.paymentMethod === "Momo"){
+                drinksMomo += itemTotal;
+            }
+
+        }
+
+    });
 
 }
 
@@ -332,15 +362,59 @@ document.getElementById("revenueSummary").innerHTML = `
         Paid Tables: ${paidTables}
     `;
 
+const foodTotal =
+    foodCash + foodMomo;
+
+const drinksTotal =
+    drinksCash + drinksMomo;
+
+const overallTotal =
+    foodTotal + drinksTotal;
+
 document.getElementById("paymentAnalysis").innerHTML = `
-    <h2>💰 PAYMENT ANALYSIS</h2>
 
-    Food Cash: GHS ${foodCash.toFixed(2)}<br>
-    Food Momo: GHS ${foodMomo.toFixed(2)}<br>
+<div style="
+background:#f8f9fa;
+padding:15px;
+border-radius:10px;
+">
 
-    <hr>
+<h2>💰 PAYMENT ANALYSIS</h2>
 
-    Total: GHS ${(foodCash + foodMomo).toFixed(2)}
+<hr>
+
+<h3>🍕 FOOD SALES</h3>
+
+Food Cash:
+<b>GHS ${foodCash.toFixed(2)}</b><br>
+
+Food Momo:
+<b>GHS ${foodMomo.toFixed(2)}</b><br>
+
+Food Total:
+<b>GHS ${foodTotal.toFixed(2)}</b>
+
+<hr>
+
+<h3>🥤 DRINK SALES</h3>
+
+Drinks Cash:
+<b>GHS ${drinksCash.toFixed(2)}</b><br>
+
+Drinks Momo:
+<b>GHS ${drinksMomo.toFixed(2)}</b><br>
+
+Drinks Total:
+<b>GHS ${drinksTotal.toFixed(2)}</b>
+
+<hr>
+
+<h2>
+OVERALL TOTAL:
+GHS ${overallTotal.toFixed(2)}
+</h2>
+
+</div>
 `;
 
 });
