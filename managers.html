@@ -1,3 +1,5 @@
+Managers.html
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -80,6 +82,20 @@ border-radius:10px;
 box-shadow:0 2px 5px rgba(0,0,0,.1);
 ">
 Payment Analysis Loading...
+</div>
+
+<div id="salesInsights"
+style="
+background:white;
+padding:15px;
+margin-bottom:20px;
+border-radius:10px;
+box-shadow:0 2px 5px rgba(0,0,0,.1);
+">
+<h2>📊 SALES INSIGHTS</h2>
+
+Most Sold Food: Loading...<br>
+Most Sold Drink: Loading...
 </div>
 
 <div id="topWaiter"
@@ -277,6 +293,9 @@ db.collection("completedOrders")
     let totalRevenue = 0;
     let paidTables = 0;
 
+let foodSales = {};
+let drinkSales = {};
+
 let foodCash = 0;
 let foodMomo = 0;
 
@@ -356,17 +375,37 @@ if(data.orders){
 
         if (data.orders) {
 
-            data.orders.forEach(order => {
+    data.orders.forEach(order => {
 
-                ordersHTML += `
-                    <li>
-                        ${order.name}
-                        x${order.qty}
-                    </li>
-                `;
+        ordersHTML += `
+            <li>
+                ${order.name}
+                x${order.qty}
+            </li>
+        `;
 
-            });
+        // COUNT FOOD SALES
+        if ((order.category || "").toLowerCase() === "food") {
+
+            if (!foodSales[order.name]) {
+                foodSales[order.name] = 0;
+            }
+
+            foodSales[order.name] += Number(order.qty || 0);
         }
+
+        // COUNT DRINK SALES
+        if ((order.category || "").toLowerCase() === "drink") {
+
+            if (!drinkSales[order.name]) {
+                drinkSales[order.name] = 0;
+            }
+
+            drinkSales[order.name] += Number(order.qty || 0);
+        }
+
+    });
+}
 
         completed.innerHTML += `
             <div class="table-card">
@@ -401,6 +440,46 @@ document.getElementById("revenueSummary").innerHTML = `
         <br>
         Paid Tables: ${paidTables}
     `;
+
+let mostSoldFood = "None";
+let mostSoldFoodQty = 0;
+
+for (let food in foodSales) {
+
+    if (foodSales[food] > mostSoldFoodQty) {
+
+        mostSoldFoodQty = foodSales[food];
+        mostSoldFood = food;
+    }
+}
+
+let mostSoldDrink = "None";
+let mostSoldDrinkQty = 0;
+
+for (let drink in drinkSales) {
+
+    if (drinkSales[drink] > mostSoldDrinkQty) {
+
+        mostSoldDrinkQty = drinkSales[drink];
+        mostSoldDrink = drink;
+    }
+}
+
+document.getElementById("salesInsights").innerHTML = `
+    <h2>📊 SALES INSIGHTS</h2>
+
+    <p>
+        🏆 <b>Most Sold Food:</b><br>
+        ${mostSoldFood}
+        (${mostSoldFoodQty} sold)
+    </p>
+
+    <p>
+        🥤 <b>Most Sold Drink:</b><br>
+        ${mostSoldDrink}
+        (${mostSoldDrinkQty} sold)
+    </p>
+`;
 
 const foodTotal =
     foodCash + foodMomo;
