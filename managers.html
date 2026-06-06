@@ -46,6 +46,14 @@ font-weight:bold;
 Loading...
 </div>
 
+<hr>
+
+<h1>Paid Tables</h1>
+
+<div id="completedDashboard">
+Loading...
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
@@ -122,6 +130,59 @@ db.collection("liveOrders")
             <div class="table-card">
 
                 <h2>Table ${doc.id}</h2>
+
+                <ul>
+                    ${ordersHTML}
+                </ul>
+
+            </div>
+        `;
+    });
+
+});
+
+db.collection("completedOrders")
+.onSnapshot((snapshot) => {
+
+    const completed =
+        document.getElementById("completedDashboard");
+
+    completed.innerHTML = "";
+
+    snapshot.forEach((doc) => {
+
+        const data = doc.data();
+
+        let ordersHTML = "";
+
+        if (data.orders) {
+
+            data.orders.forEach(order => {
+
+                ordersHTML += `
+                    <li>
+                        ${order.name}
+                        x${order.qty}
+                    </li>
+                `;
+
+            });
+        }
+
+        completed.innerHTML += `
+            <div class="table-card">
+
+                <h2>Table ${data.table}</h2>
+
+                <p>
+                    Paid At:
+                    ${data.paidAt || ""}
+                </p>
+
+                <p>
+                    Total:
+                    GHS ${data.total || 0}
+                </p>
 
                 <ul>
                     ${ordersHTML}
