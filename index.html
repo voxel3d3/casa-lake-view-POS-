@@ -2044,8 +2044,6 @@ await sendRawToUsbPrinter(commands);
 
 alert("Payment bill printed successfully.");
 
-const paidOrders = JSON.parse(JSON.stringify(tableOrders[currentTable] || []));
-
 // CLEAR CURRENT TABLE AFTER PAYMENT
 
 const paidOrders = JSON.parse(JSON.stringify(tableOrders[currentTable] || []));
