@@ -26,40 +26,70 @@
 
 <body>
 
-<div style="text-align:center; margin-bottom:20px;">
-    <img src="logo.png"
-         alt="Casa Lakeview Resort"
-         style="width:150px;">
+<div id="managerLogin"
+style="
+max-width:400px;
+margin:50px auto;
+background:white;
+padding:30px;
+border-radius:10px;
+box-shadow:0 2px 10px rgba(0,0,0,.1);
+">
 
-    <h1>
-        CASA LAKEVIEW RESORT
-    </h1>
+    <div style="text-align:center; margin-bottom:20px;">
+        <img src="logo.png"
+             alt="Casa Lakeview Resort"
+             style="width:180px;">
+    </div>
 
-    <p>
-        Bosomtwe Abono
-    </p>
-</div>
+    <h2 style="text-align:center;">
+        Manager Login
+    </h2>
 
-<div style="text-align:center; margin-bottom:20px;">
+    <input
+        type="text"
+        id="managerUsername"
+        placeholder="Username"
+        style="
+            width:100%;
+            padding:10px;
+            margin-bottom:10px;
+            box-sizing:border-box;
+        "
+    >
 
-    <img
-    src="logo.png"
-    alt="Company Logo"
-    style="
-    width:120px;
-    height:auto;
-    display:block;
-    margin:0 auto 10px auto;
-    ">
+    <input
+        type="password"
+        id="managerPassword"
+        placeholder="Password"
+        style="
+            width:100%;
+            padding:10px;
+            margin-bottom:15px;
+            box-sizing:border-box;
+        "
+    >
 
-    <h1 style="margin:0;">
-        Live Orders Dashboard
-    </h1>
+    <button
+        onclick="loginManager()"
+        style="
+            width:100%;
+            padding:10px;
+            background:#27ae60;
+            color:white;
+            border:none;
+            cursor:pointer;
+            border-radius:5px;
+        "
+    >
+        LOGIN
+    </button>
 
 </div>
 
 <div id="revenueSummary"
 style="
+display:none;
 background:white;
 padding:15px;
 margin-bottom:20px;
@@ -73,6 +103,7 @@ Today's Revenue: GHS 0.00
 
 <div id="paymentAnalysis"
 style="
+display:none;
 background:white;
 padding:15px;
 margin-bottom:20px;
@@ -84,20 +115,24 @@ Payment Analysis Loading...
 
 <div id="salesInsights"
 style="
+display:none;
 background:white;
 padding:15px;
 margin-bottom:20px;
 border-radius:10px;
 box-shadow:0 2px 5px rgba(0,0,0,.1);
 ">
-<h2>📊 SALES INSIGHTS</h2>
 
-Most Sold Food: Loading...<br>
-Most Sold Drink: Loading...
+    <h2>📊 SALES INSIGHTS</h2>
+
+    Most Sold Food: Loading...<br>
+    Most Sold Drink: Loading...
+
 </div>
 
 <div id="topWaiter"
 style="
+display:none;
 background:white;
 padding:15px;
 margin-bottom:20px;
@@ -107,8 +142,11 @@ box-shadow:0 2px 5px rgba(0,0,0,.1);
 🏆 Top Waiter Loading...
 </div>
 
-<button onclick="clearDashboard()"
+<button
+id="clearDashboardBtn"
+onclick="clearDashboard()"
 style="
+display:none;
 padding:10px 20px;
 background:#e74c3c;
 color:white;
@@ -121,8 +159,11 @@ font-weight:bold;
 🗑 Clear Dashboard
 </button>
 
-<button onclick="clearPaidTables()"
+<button
+id="clearPaidTablesBtn"
+onclick="clearPaidTables()"
 style="
+display:none;
 padding:10px 20px;
 background:#f39c12;
 color:white;
@@ -136,14 +177,16 @@ margin-left:10px;
 📅 Start New Day
 </button>
 
-<div id="dashboard">
-Loading...
+<div id="dashboard" style="display:none;">
+    Loading...
 </div>
 
-<hr>
+<hr style="display:none;" id="paidTablesDivider">
 
 <div
+id="paidTablesHeader"
 style="
+display:none;
 background:#2ecc71;
 color:white;
 padding:20px;
@@ -158,8 +201,8 @@ letter-spacing:2px;
 ✅ PAID TABLES
 </div>
 
-<div id="completedDashboard">
-Loading...
+<div id="completedDashboard" style="display:none;">
+    Loading...
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -575,6 +618,59 @@ document.getElementById("topWaiter").innerHTML = `
 `;
 
 });
+
+function loginManager() {
+
+    const username =
+        document.getElementById("managerUsername").value;
+
+    const password =
+        document.getElementById("managerPassword").value;
+
+    if (
+        username === "kingpin" &&
+        password === "king3."
+    ) {
+
+        document.getElementById("managerLogin")
+            .style.display = "none";
+
+        document.getElementById("revenueSummary")
+            .style.display = "block";
+
+        document.getElementById("paymentAnalysis")
+            .style.display = "block";
+
+        document.getElementById("salesInsights")
+            .style.display = "block";
+
+        document.getElementById("topWaiter")
+            .style.display = "block";
+
+        document.getElementById("clearDashboardBtn")
+            .style.display = "inline-block";
+
+        document.getElementById("clearPaidTablesBtn")
+            .style.display = "inline-block";
+
+        document.getElementById("dashboard")
+            .style.display = "block";
+
+        document.getElementById("paidTablesDivider")
+            .style.display = "block";
+
+        document.getElementById("paidTablesHeader")
+            .style.display = "block";
+
+        document.getElementById("completedDashboard")
+            .style.display = "block";
+
+    } else {
+
+        alert("Invalid Username or Password");
+
+    }
+}
 
 </script>
 
