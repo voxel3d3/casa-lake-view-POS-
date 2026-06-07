@@ -459,196 +459,132 @@ db.collection("liveOrders")
 
     let html = "";
 
-    foodCash = 0;
-    foodMomo = 0;
-
     snapshot.forEach((doc) => {
 
         const data = doc.data();
 
-        // totals
-        if (data.paymentMethod === "Cash") {
-            foodCash += Number(data.total || 0);
-        }
-
-        if (data.paymentMethod === "Momo") {
-            foodMomo += Number(data.total || 0);
-        }
-
         let ordersHTML = "";
 
-        if (data.orders) {
+        if (data.orders && Array.isArray(data.orders)) {
             data.orders.forEach(order => {
                 ordersHTML += `
-                    <li>${order.name} x${order.qty}</li>
+                    <li>
+                        ${order.name} x${order.qty}
+                        - ${order.createdBy || ""}
+                    </li>
                 `;
             });
         }
 
-        // NEW TABLE CHECK
-        let isNew = !previousTables[doc.id];
-
-        previousTables[doc.id] = true;
-
         html += `
-            <div class="table-card ${isNew ? "new-table" : ""}">
+            <div class="table-card">
                 <h2>Table ${doc.id}</h2>
                 <ul>${ordersHTML}</ul>
             </div>
         `;
     });
 
-    dashboard.innerHTML = html;
+    dashboard.innerHTML = html || "No live orders";
 });
 
 db.collection("completedOrders")
 .onSnapshot((snapshot) => {
 
-totalRevenue = 0;
-paidTables = 0;
+    const completed = document.getElementById("completedDashboard");
 
-let foodSales = {};
-let drinkSales = {};
+    totalRevenue = 0;
+    paidTables = 0;
 
-let foodCash = 0;
-let foodMomo = 0;
+    let foodSales = {};
+    let drinkSales = {};
 
-let drinksCash = 0;
-let drinksMomo = 0;
+    let foodCash = 0;
+    let foodMomo = 0;
 
-let waiterSales = {};
+    let drinksCash = 0;
+    let drinksMomo = 0;
 
-    const completed =
-        document.getElementById("completedDashboard");
+    let waiterSales = {};
 
-    completed.innerHTML = "";
+    let html = ""; // ✅ IMPORTANT FIX
 
     snapshot.forEach((doc) => {
 
         const data = doc.data();
 
-console.log("Payment:", data.paymentMethod);
-console.log("Total:", data.total);
+        paidTables++;
+        totalRevenue += Number(data.total || 0);
 
-console.log(data);
+        const waiterName = data.waiter || "Unknown";
 
-paidTables++;
-
-totalRevenue += Number(data.total || 0);
-
-const waiterName =
-    data.waiter || "Unknown";
-
-if (!waiterSales[waiterName]) {
-    waiterSales[waiterName] = 0;
-}
-
-waiterSales[waiterName] +=
-    Number(data.total || 0);
-
-if(data.orders){
-
-    data.orders.forEach(item => {
-
-        const itemTotal =
-            (item.price || 0) *
-            (item.qty || 0);
-
-        const category =
-            (item.category || "").toLowerCase();
-
-        if(category === "food"){
-
-            if(data.paymentMethod === "Cash"){
-                foodCash += itemTotal;
-            }
-
-            if(data.paymentMethod === "Momo"){
-                foodMomo += itemTotal;
-            }
-
+        if (!waiterSales[waiterName]) {
+            waiterSales[waiterName] = 0;
         }
 
-        if(category === "drink"){
+        waiterSales[waiterName] += Number(data.total || 0);
 
-            if(data.paymentMethod === "Cash"){
-                drinksCash += itemTotal;
-            }
+        if (data.orders) {
 
-            if(data.paymentMethod === "Momo"){
-                drinksMomo += itemTotal;
-            }
+            data.orders.forEach(item => {
 
+                const itemTotal = (item.price || 0) * (item.qty || 0);
+
+                const category = (item.category || "").toLowerCase();
+
+                if (category === "food") {
+                    if (data.paymentMethod === "Cash") foodCash += itemTotal;
+                    if (data.paymentMethod === "Momo") foodMomo += itemTotal;
+                }
+
+                if (category === "drink") {
+                    if (data.paymentMethod === "Cash") drinksCash += itemTotal;
+                    if (data.paymentMethod === "Momo") drinksMomo += itemTotal;
+                }
+            });
         }
-
-    });
-
-}
 
         let ordersHTML = "";
 
         if (data.orders) {
 
-    data.orders.forEach(order => {
+            data.orders.forEach(order => {
 
-        ordersHTML += `
-            <li>
-                ${order.name}
-                x${order.qty}
-            </li>
-        `;
+                ordersHTML += `
+                    <li>${order.name} x${order.qty}</li>
+                `;
 
-        // COUNT FOOD SALES
-        if ((order.category || "").toLowerCase() === "food") {
+                if ((order.category || "").toLowerCase() === "food") {
+                    foodSales[order.name] =
+                        (foodSales[order.name] || 0) + Number(order.qty || 0);
+                }
 
-            if (!foodSales[order.name]) {
-                foodSales[order.name] = 0;
-            }
-
-            foodSales[order.name] += Number(order.qty || 0);
+                if ((order.category || "").toLowerCase() === "drink") {
+                    drinkSales[order.name] =
+                        (drinkSales[order.name] || 0) + Number(order.qty || 0);
+                }
+            });
         }
 
-        // COUNT DRINK SALES
-        if ((order.category || "").toLowerCase() === "drink") {
-
-            if (!drinkSales[order.name]) {
-                drinkSales[order.name] = 0;
-            }
-
-            drinkSales[order.name] += Number(order.qty || 0);
-        }
-
-    });
-}
-
-        completed.innerHTML += `
+        html += `
             <div class="table-card">
 
                 <h2>Table ${data.table}</h2>
 
-                <p>
-                    Paid At:
-                    ${data.paidAt || ""}
-                </p>
+                <p>Paid At: ${data.paidAt || ""}</p>
 
-<p>
-    Waiter/Waitress:
-    <b>${data.waiter || "Not Recorded"}</b>
-</p>
+                <p>Waiter: <b>${data.waiter || "Not Recorded"}</b></p>
 
-                <p>
-                    Total:
-                    GHS ${data.total || 0}
-                </p>
+                <p>Total: GHS ${data.total || 0}</p>
 
-                <ul>
-                    ${ordersHTML}
-                </ul>
+                <ul>${ordersHTML}</ul>
 
             </div>
         `;
-
     });
+
+    completed.innerHTML = html || "No completed orders";
+});
+
 document.getElementById("revenueSummary").innerHTML = `
         Today's Revenue: GHS ${totalRevenue.toFixed(2)}
         <br>
