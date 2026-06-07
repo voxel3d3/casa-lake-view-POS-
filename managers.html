@@ -335,15 +335,6 @@ let mostSoldDrinkQty = 0;
 
 let previousTables = {};
 
-let foodSales = {};
-let drinkSales = {};
-let waiterSales = {};
-
-let foodCash = 0;
-let foodMomo = 0;
-
-let drinksCash = 0;
-let drinksMomo = 0;
 
 function clearDashboard() {
 
@@ -593,7 +584,6 @@ db.collection("completedOrders")
     });
 
     completed.innerHTML = html || "No completed orders";
-});
 
 document.getElementById("revenueSummary").innerHTML = `
         Today's Revenue: GHS ${totalRevenue.toFixed(2)}
@@ -736,6 +726,8 @@ document.getElementById("topWaiter").innerHTML = `
 
     </div>
 `;
+
+});
 
 function loginManager() {
 
