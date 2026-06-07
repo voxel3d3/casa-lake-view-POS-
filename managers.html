@@ -163,12 +163,19 @@ font-weight:bold;
 
 <button
 id="clearPaidTablesBtn"
-onclick="alert('Button works!')"
-...
->
-📅 Start New Day
-</button>
-
+onclick="clearPaidTables()"
+style="
+display:none;
+padding:10px 20px;
+background:#f39c12;
+color:white;
+border:none;
+border-radius:6px;
+cursor:pointer;
+margin-bottom:20px;
+font-weight:bold;
+margin-left:10px;
+">
 📅 Start New Day
 </button>
 
@@ -278,6 +285,8 @@ function clearDashboard() {
 
 function clearPaidTables() {
 
+    alert("Function started");
+
     alert(
     `END OF DAY REPORT
 
@@ -288,9 +297,9 @@ Paid Tables:
 ${paidTables}
 
 (Confirm button coming next...)`
-);
+    );
 
-return;
+    return;
 
     db.collection("completedOrders")
     .get()
