@@ -257,6 +257,16 @@ letter-spacing:2px;
     Loading...
 </div>
 
+<div id="dailyReports"
+style="
+display:none;
+background:white;
+padding:20px;
+margin-top:20px;
+border-radius:10px;
+box-shadow:0 2px 5px rgba(0,0,0,.1);
+">
+
 <h2>📅 Daily Reports</h2>
 
 <select
@@ -288,6 +298,8 @@ letter-spacing:2px;
 
 <div id="dailyReportResults"
 style="margin-top:20px;">
+</div>
+
 </div>
 
 <div id="monthlyReports"
@@ -874,6 +886,8 @@ function populateDates() {
     .orderBy("date", "desc")
     .get()
     .then((snapshot) => {
+
+console.log(snapshot.size);
 
         snapshot.forEach((doc) => {
 
