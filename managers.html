@@ -842,6 +842,52 @@ populateMonths();
     }
 }
 
+function populateMonths() {
+
+    const monthSelect =
+        document.getElementById("reportMonth");
+
+    monthSelect.innerHTML = `
+        <option value="">
+            Select Month
+        </option>
+    `;
+
+    db.collection("dailyReports")
+    .get()
+    .then((snapshot) => {
+
+        const months = new Set();
+
+        snapshot.forEach((doc) => {
+
+            const data = doc.data();
+
+            if (data.date) {
+
+                // Extract YYYY-MM
+                const month =
+                    data.date.substring(0, 7);
+
+                months.add(month);
+            }
+
+        });
+
+        months.forEach((month) => {
+
+            monthSelect.innerHTML += `
+                <option value="${month}">
+                    ${month}
+                </option>
+            `;
+
+        });
+
+    });
+
+}
+
 </script>
 
 </body>
