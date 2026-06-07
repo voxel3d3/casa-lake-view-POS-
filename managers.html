@@ -122,6 +122,21 @@ font-weight:bold;
 Today's Revenue: GHS 0.00
 </div>
 
+<button
+    onclick="printDailyReport()"
+    style="
+        padding:10px 20px;
+        background:#2c3e50;
+        color:white;
+        border:none;
+        border-radius:5px;
+        cursor:pointer;
+        margin-left:10px;
+    "
+>
+    🖨 Print A4 Report
+</button>
+
 <div id="paymentAnalysis"
 style="
 display:none;
@@ -303,36 +318,6 @@ style="margin-top:20px;">
 </div>
 
 </div>
-
-<button
-    onclick="downloadDailyReportPDF()"
-    style="
-        padding:10px 20px;
-        background:#e67e22;
-        color:white;
-        border:none;
-        border-radius:5px;
-        cursor:pointer;
-        margin-left:10px;
-    "
->
-    ⬇ Download PDF
-</button>
-
-<button
-    onclick="printDailyReport()"
-    style="
-        padding:10px 20px;
-        background:#2c3e50;
-        color:white;
-        border:none;
-        border-radius:5px;
-        cursor:pointer;
-        margin-left:10px;
-    "
->
-    🖨 Print A4 Report
-</button>
 
 <div id="monthlyReports"
 style="
@@ -563,135 +548,6 @@ function printDailyReport() {
         `);
 
         win.document.close();
-    });
-}
-
-function downloadDailyReportPDF() {
-
-    const selectedDate =
-        document.getElementById("reportDate").value;
-
-    if (!selectedDate) {
-        alert("Please select a date first.");
-        return;
-    }
-
-    // STEP 1: Get ALL reports first
-    db.collection("dailyReports")
-    .get()
-    .then((snapshot) => {
-
-        let allReports = [];
-
-        snapshot.forEach(doc => {
-            allReports.push(doc.data());
-        });
-
-        const invoiceNumber =
-            generateInvoiceNumber(selectedDate, allReports);
-
-        // STEP 2: Get selected report
-        return db.collection("dailyReports")
-            .doc(selectedDate)
-            .get()
-            .then((doc) => {
-
-                if (!doc.exists) {
-                    alert("No report found for this date.");
-                    return;
-                }
-
-                const data = doc.data();
-
-                getBase64Image(window.location.origin + "/logo.png", function(logo) {
-
-                    const { jsPDF } = window.jspdf;
-                    const pdf = new jsPDF();
-
-                    let y = 10;
-
-                    // ======================
-                    // LOGO + HEADER
-                    // ======================
-                    pdf.addImage(logo, "PNG", 85, y, 40, 20);
-                    y += 30;
-
-                    pdf.setFontSize(16);
-                    pdf.text("CASA LAKEVIEW RESORT", 105, y, { align: "center" });
-                    y += 8;
-
-                    pdf.setFontSize(12);
-                    pdf.text("DAILY SALES REPORT", 105, y, { align: "center" });
-                    y += 10;
-
-                    pdf.line(10, y, 200, y);
-                    y += 10;
-
-                    // ======================
-                    // INVOICE NUMBER
-                    // ======================
-                    pdf.setFontSize(12);
-                    pdf.setFont(undefined, "bold");
-                    pdf.text(`Invoice No: ${invoiceNumber}`, 10, y);
-                    pdf.setFont(undefined, "normal");
-                    y += 10;
-
-                    pdf.text(`Date: ${data.date}`, 10, y);
-                    y += 8;
-
-                    pdf.text(`Generated: ${new Date().toLocaleString()}`, 10, y);
-                    y += 10;
-
-                    pdf.line(10, y, 200, y);
-                    y += 10;
-
-                    // ======================
-                    // TABLE HEADER
-                    // ======================
-                    pdf.setFontSize(12);
-                    pdf.setFont(undefined, "bold");
-                    pdf.text("SUMMARY DETAILS", 10, y);
-                    pdf.setFont(undefined, "normal");
-                    y += 8;
-
-                    function row(label, value) {
-
-                        pdf.setFillColor(245, 245, 245);
-                        pdf.rect(10, y - 5, 190, 8, "F");
-
-                        pdf.setFontSize(11);
-                        pdf.setFont(undefined, "bold");
-                        pdf.text(label, 12, y);
-
-                        pdf.setFont(undefined, "normal");
-                        pdf.text(String(value), 120, y);
-
-                        y += 10;
-                    }
-
-                    row("Total Revenue (GHS)", data.totalRevenue || 0);
-                    row("Paid Tables", data.paidTables || 0);
-                    row("Top Waiter", data.topWaiter || "None");
-                    row("Top Sales (GHS)", data.topWaiterSales || 0);
-                    row("Most Sold Food", data.mostSoldFood || "None");
-                    row("Most Sold Drink", data.mostSoldDrink || "None");
-
-                    y += 10;
-
-                    pdf.line(10, y, 200, y);
-                    y += 10;
-
-                    pdf.setFontSize(10);
-                    pdf.text(
-                        "Generated by Casa Lakeview Resort System",
-                        105,
-                        y,
-                        { align: "center" }
-                    );
-
-                    pdf.save(`${invoiceNumber}_${data.date}.pdf`);
-                });
-            });
     });
 }
 
