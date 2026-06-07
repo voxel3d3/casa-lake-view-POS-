@@ -802,56 +802,38 @@ function loginManager() {
         document.getElementById("managerPassword").value;
 
     if (
-        username === "kingpin" &&
-        password === "king3."
-    ) {
+    username === "kingpin" &&
+    password === "king3."
+) {
 
-        document.getElementById("managerLogin")
-            .style.display = "none";
+    // 1. HIDE LOGIN
+    document.getElementById("managerLogin").style.display = "none";
 
-        document.getElementById("revenueSummary")
-            .style.display = "block";
+    // 2. SHOW DASHBOARD SECTIONS
+    document.getElementById("revenueSummary").style.display = "block";
+    document.getElementById("paymentAnalysis").style.display = "block";
+    document.getElementById("salesInsights").style.display = "block";
+    document.getElementById("topWaiter").style.display = "block";
+    document.getElementById("clearDashboardBtn").style.display = "inline-block";
+    document.getElementById("clearPaidTablesBtn").style.display = "inline-block";
+    document.getElementById("dashboardHeader").style.display = "block";
+    document.getElementById("dashboard").style.display = "block";
+    document.getElementById("paidTablesHeader").style.display = "block";
+    document.getElementById("completedDashboard").style.display = "block";
+    document.getElementById("monthlyReports").style.display = "block";
 
-        document.getElementById("paymentAnalysis")
-            .style.display = "block";
+    // 3. SHOW LOADING STATE
+    document.getElementById("dashboard").innerHTML = "Loading...";
+    document.getElementById("completedDashboard").innerHTML = "Loading...";
 
-        document.getElementById("salesInsights")
-            .style.display = "block";
+    // 4. LOAD MONTHS
+    populateMonths();
 
-        document.getElementById("topWaiter")
-            .style.display = "block";
+    // 5. START FIREBASE LISTENERS (IMPORTANT LAST)
+    startDashboard();
 
-        document.getElementById("clearDashboardBtn")
-            .style.display = "inline-block";
-
-        document.getElementById("clearPaidTablesBtn")
-            .style.display = "inline-block";
-
-document.getElementById("dashboardHeader")
-    .style.display = "block";
-
-        document.getElementById("dashboard")
-            .style.display = "block";
-
-        document.getElementById("paidTablesDivider")
-            .style.display = "block";
-
-        document.getElementById("paidTablesHeader")
-            .style.display = "block";
-
-        document.getElementById("completedDashboard")
-            .style.display = "block";
-
-document.getElementById("monthlyReports")
-    .style.display = "block";
-
-populateMonths();
-
-    } else {
-
-        alert("Invalid Username or Password");
-
-    }
+} else {
+    alert("Invalid Username or Password");
 }
 
 function populateMonths() {
