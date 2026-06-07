@@ -322,7 +322,7 @@ alert("Most Sold Drink: " + mostSoldDrink);
         paidTables: paidTables,
 
         // TOP WAITER / WAITRESS
-        topWaiter: topWaiter,
+        topWaiter: topWaiterName,
 
         topWaiterSales: topSales,
 
@@ -684,7 +684,8 @@ GHS ${overallTotal.toFixed(2)}
 </div>
 `;
 
-let topWaiter = "";
+let topWaiterName = "";
+
 let topSales = 0;
 
 for (let waiter in waiterSales) {
@@ -692,7 +693,7 @@ for (let waiter in waiterSales) {
     if (waiterSales[waiter] > topSales) {
 
         topSales = waiterSales[waiter];
-        topWaiter = waiter;
+        topWaiterName = waiter;
     }
 }
 
@@ -709,7 +710,7 @@ document.getElementById("topWaiter").innerHTML = `
             color:#27ae60;
             margin:10px 0;
         ">
-            ${topWaiter || "No Sales Yet"}
+            ${topWaiterName || "No Sales Yet"}
         </h1>
 
         <p style="
