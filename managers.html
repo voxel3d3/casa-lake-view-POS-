@@ -285,13 +285,8 @@ function clearDashboard() {
 
 function clearPaidTables() {
 
-    alert("Function started");
-
-alert("Revenue = " + totalRevenue);
-alert("Paid Tables = " + paidTables);
-
-    alert(
-    `END OF DAY REPORT
+    const proceed = confirm(
+`END OF DAY REPORT
 
 Today's Revenue:
 GHS ${totalRevenue.toFixed(2)}
@@ -299,22 +294,33 @@ GHS ${totalRevenue.toFixed(2)}
 Paid Tables:
 ${paidTables}
 
-(Confirm button coming next...)`
+Do you want to close the day?`
     );
 
-    return;
+    if (!proceed) {
+        return;
+    }
 
-    db.collection("completedOrders")
-    .get()
-    .then((snapshot) => {
+    db.collection("dailyReports")
+    .add({
 
-        snapshot.forEach((doc) => {
+        date: new Date().toLocaleDateString(),
 
-            doc.ref.delete();
+        totalRevenue: totalRevenue,
 
-        });
+        paidTables: paidTables,
 
-        alert("Paid tables cleared. New day started.");
+        createdAt: new Date().toISOString()
+
+    })
+    .then(() => {
+
+        alert("Daily report saved successfully!");
+
+    })
+    .catch((error) => {
+
+        alert("Error saving report: " + error.message);
 
     });
 
