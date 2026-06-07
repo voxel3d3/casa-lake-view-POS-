@@ -435,6 +435,15 @@ if(data.paymentMethod === "Momo"){
 let totalRevenue = 0;
 let paidTables = 0;
 
+let topWaiterName = "";
+let topSales = 0;
+
+let mostSoldFood = "None";
+let mostSoldFoodQty = 0;
+
+mostSoldDrink = "None";
+mostSoldDrinkQty = 0;
+
 db.collection("completedOrders")
 .onSnapshot((snapshot) => {
 
@@ -589,8 +598,8 @@ document.getElementById("revenueSummary").innerHTML = `
         Paid Tables: ${paidTables}
     `;
 
-let mostSoldFood = "None";
-let mostSoldFoodQty = 0;
+mostSoldFood = "None";
+mostSoldFoodQty = 0;
 
 for (let food in foodSales) {
 
@@ -684,9 +693,9 @@ GHS ${overallTotal.toFixed(2)}
 </div>
 `;
 
-let topWaiterName = "";
+topWaiterName = "";
 
-let topSales = 0;
+topSales = 0;
 
 for (let waiter in waiterSales) {
 
