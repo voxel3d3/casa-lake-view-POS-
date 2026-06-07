@@ -304,6 +304,18 @@ firebase.initializeApp(firebaseConfig);
 
 const db = firebase.firestore();
 
+let totalRevenue = 0;
+let paidTables = 0;
+
+let topWaiterName = "";
+let topSales = 0;
+
+let mostSoldFood = "None";
+let mostSoldFoodQty = 0;
+
+let mostSoldDrink = "None";
+let mostSoldDrinkQty = 0;
+
 function clearDashboard() {
 
     if(!confirm(
@@ -486,8 +498,8 @@ let topSales = 0;
 let mostSoldFood = "None";
 let mostSoldFoodQty = 0;
 
-mostSoldDrink = "None";
-mostSoldDrinkQty = 0;
+let mostSoldDrink = "None";
+let mostSoldDrinkQty = 0;
 
 db.collection("completedOrders")
 .onSnapshot((snapshot) => {
@@ -655,8 +667,8 @@ for (let food in foodSales) {
     }
 }
 
-let mostSoldDrink = "None";
-let mostSoldDrinkQty = 0;
+mostSoldDrink = "None";
+mostSoldDrinkQty = 0;
 
 for (let drink in drinkSales) {
 
