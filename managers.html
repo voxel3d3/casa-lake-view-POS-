@@ -20,6 +20,23 @@ Managers.html
             box-shadow:0 2px 5px rgba(0,0,0,.1);
         }
 
+.new-table {
+    animation: pop 0.6s ease;
+    border: 2px solid #27ae60;
+    box-shadow: 0 0 12px rgba(39,174,96,0.5);
+}
+
+@keyframes pop {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
         h2{
             margin:0 0 10px 0;
         }
@@ -316,6 +333,8 @@ let mostSoldFoodQty = 0;
 let mostSoldDrink = "None";
 let mostSoldDrinkQty = 0;
 
+let previousTables = {};
+
 function clearDashboard() {
 
     if(!confirm(
@@ -436,57 +455,50 @@ alert("Most Sold Drink: " + mostSoldDrink);
 db.collection("liveOrders")
 .onSnapshot((snapshot) => {
 
-    const dashboard =
-        document.getElementById("dashboard");
+    const dashboard = document.getElementById("dashboard");
 
-    dashboard.innerHTML = "";
+    let html = "";
+
+    foodCash = 0;
+    foodMomo = 0;
 
     snapshot.forEach((doc) => {
 
         const data = doc.data();
 
-if(data.paymentMethod === "Cash"){
+        // totals
+        if (data.paymentMethod === "Cash") {
+            foodCash += Number(data.total || 0);
+        }
 
-    foodCash += Number(data.total || 0);
-
-}
-
-if(data.paymentMethod === "Momo"){
-
-    foodMomo += Number(data.total || 0);
-
-}
+        if (data.paymentMethod === "Momo") {
+            foodMomo += Number(data.total || 0);
+        }
 
         let ordersHTML = "";
 
         if (data.orders) {
-
             data.orders.forEach(order => {
-
                 ordersHTML += `
-                    <li>
-                        ${order.name}
-                        x${order.qty}
-                        - ${order.createdBy}
-                    </li>
+                    <li>${order.name} x${order.qty}</li>
                 `;
-
             });
         }
 
-        dashboard.innerHTML += `
-            <div class="table-card">
+        // NEW TABLE CHECK
+        let isNew = !previousTables[doc.id];
 
+        previousTables[doc.id] = true;
+
+        html += `
+            <div class="table-card ${isNew ? "new-table" : ""}">
                 <h2>Table ${doc.id}</h2>
-
-                <ul>
-                    ${ordersHTML}
-                </ul>
-
+                <ul>${ordersHTML}</ul>
             </div>
         `;
     });
 
+    dashboard.innerHTML = html;
 });
 
 db.collection("completedOrders")
