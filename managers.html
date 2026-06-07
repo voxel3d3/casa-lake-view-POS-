@@ -257,6 +257,39 @@ letter-spacing:2px;
     Loading...
 </div>
 
+<h2>📅 Daily Reports</h2>
+
+<select
+    id="reportDate"
+    style="
+        padding:10px;
+        margin-bottom:15px;
+        border-radius:5px;
+    "
+>
+    <option value="">
+        Select Date
+    </option>
+</select>
+
+<button
+    onclick="loadDailyReport()"
+    style="
+        padding:10px 20px;
+        background:#27ae60;
+        color:white;
+        border:none;
+        border-radius:5px;
+        cursor:pointer;
+    "
+>
+    View Report
+</button>
+
+<div id="dailyReportResults"
+style="margin-top:20px;">
+</div>
+
 <div id="monthlyReports"
 style="
 display:none;
@@ -386,9 +419,9 @@ alert("Most Sold Food: " + mostSoldFood);
 
 alert("Most Sold Drink: " + mostSoldDrink);
 
-    db.collection("dailyReports")
-    .add({
-
+   db.collection("dailyReports")
+    .doc(new Date().toISOString().split("T")[0])
+    .set({
         // DATE
         date: new Date().toISOString().split("T")[0],
 
@@ -763,8 +796,13 @@ function loginManager() {
         document.getElementById("completedDashboard").style.display = "block";
         document.getElementById("monthlyReports").style.display = "block";
 
+document.getElementById("dailyReports").style.display = "block";
+
         // 4. INIT MONTHS
-        populateMonths();
+populateMonths();
+
+populateDates();
+
 
         // 5. START FIREBASE LISTENERS
 
@@ -816,6 +854,179 @@ function populateMonths() {
             `;
 
         });
+
+    });
+
+}
+
+function populateDates() {
+
+    const dateSelect =
+        document.getElementById("reportDate");
+
+    dateSelect.innerHTML = `
+        <option value="">
+            Select Date
+        </option>
+    `;
+
+    db.collection("dailyReports")
+    .orderBy("date", "desc")
+    .get()
+    .then((snapshot) => {
+
+        snapshot.forEach((doc) => {
+
+            const data = doc.data();
+
+            if (data.date) {
+
+                dateSelect.innerHTML += `
+                    <option value="${data.date}">
+                        ${data.date}
+                    </option>
+                `;
+            }
+
+        });
+
+    });
+
+}
+
+function loadDailyReports() {
+
+    const container =
+        document.getElementById("dailyReportResults");
+
+    container.innerHTML = "Loading reports...";
+
+    db.collection("dailyReports")
+    .orderBy("date", "desc")
+    .get()
+    .then((snapshot) => {
+
+        let html = "";
+
+        snapshot.forEach((doc) => {
+
+            const data = doc.data();
+
+            html += `
+
+                <div class="table-card">
+
+                    <h3>📅 ${data.date || ""}</h3>
+
+                    <p>
+                        💰 Revenue:
+                        GHS ${Number(data.totalRevenue || 0).toFixed(2)}
+                    </p>
+
+                    <p>
+                        🍽 Paid Tables:
+                        ${data.paidTables || 0}
+                    </p>
+
+                    <p>
+                        🏆 Top Waiter:
+                        ${data.topWaiter || "None"}
+                    </p>
+
+                    <p>
+                        🍕 Most Sold Food:
+                        ${data.mostSoldFood || "None"}
+                    </p>
+
+                    <p>
+                        🥤 Most Sold Drink:
+                        ${data.mostSoldDrink || "None"}
+                    </p>
+
+                </div>
+            `;
+
+        });
+
+        container.innerHTML =
+            html || "No daily reports found.";
+
+    })
+    .catch((error) => {
+
+        container.innerHTML =
+            "Error loading reports.";
+
+        console.error(error);
+
+    });
+
+}
+
+function loadDailyReport() {
+
+    const selectedDate =
+        document.getElementById("reportDate").value;
+
+    if (!selectedDate) {
+
+        alert("Please select a date.");
+
+        return;
+    }
+
+    db.collection("dailyReports")
+    .doc(selectedDate)
+    .get()
+    .then((doc) => {
+
+        if (!doc.exists) {
+
+            document.getElementById(
+                "dailyReportResults"
+            ).innerHTML =
+                "No report found.";
+
+            return;
+        }
+
+        const data = doc.data();
+
+        document.getElementById(
+            "dailyReportResults"
+        ).innerHTML = `
+
+            <div class="table-card">
+
+                <h2>📅 ${data.date}</h2>
+
+                <p>
+                    💰 Revenue:
+                    GHS ${Number(data.totalRevenue || 0).toFixed(2)}
+                </p>
+
+                <p>
+                    🍽 Paid Tables:
+                    ${data.paidTables || 0}
+                </p>
+
+                <p>
+                    🏆 Top Waiter:
+                    ${data.topWaiter || "None"}
+                </p>
+
+                <p>
+                    🍕 Most Sold Food:
+                    ${data.mostSoldFood || "None"}
+                </p>
+
+                <p>
+                    🥤 Most Sold Drink:
+                    ${data.mostSoldDrink || "None"}
+                </p>
+
+            </div>
+        `;
 
     });
 
