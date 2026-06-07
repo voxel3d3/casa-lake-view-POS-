@@ -489,18 +489,6 @@ if(data.paymentMethod === "Momo"){
 
 });
 
-let totalRevenue = 0;
-let paidTables = 0;
-
-let topWaiterName = "";
-let topSales = 0;
-
-let mostSoldFood = "None";
-let mostSoldFoodQty = 0;
-
-let mostSoldDrink = "None";
-let mostSoldDrinkQty = 0;
-
 db.collection("completedOrders")
 .onSnapshot((snapshot) => {
 
