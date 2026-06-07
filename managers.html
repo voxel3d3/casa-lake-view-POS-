@@ -304,12 +304,31 @@ Do you want to close the day?`
     db.collection("dailyReports")
     .add({
 
-        date: new Date().toLocaleDateString(),
+        // DATE
+        date: new Date().toISOString().split("T")[0],
 
+        // SALES
         totalRevenue: totalRevenue,
 
+        // TABLES
         paidTables: paidTables,
 
+        // TOP WAITER / WAITRESS
+        topWaiter: topWaiter,
+
+        topWaiterSales: topSales,
+
+        // MOST SOLD FOOD
+        mostSoldFood: mostSoldFood,
+
+        mostSoldFoodQty: mostSoldFoodQty,
+
+        // MOST SOLD DRINK
+        mostSoldDrink: mostSoldDrink,
+
+        mostSoldDrinkQty: mostSoldDrinkQty,
+
+        // SAVE TIME
         createdAt: new Date().toISOString()
 
     })
