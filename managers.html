@@ -888,6 +888,180 @@ function populateMonths() {
 
 }
 
+function loadMonthlyReport() {
+
+    const selectedMonth =
+        document.getElementById("reportMonth").value;
+
+    if (!selectedMonth) {
+
+        alert("Please select a month.");
+
+        return;
+    }
+
+    let monthlyRevenue = 0;
+
+    let daysRecorded = 0;
+
+    let waiterTotals = {};
+
+    let foodTotals = {};
+
+    let drinkTotals = {};
+
+    db.collection("dailyReports")
+    .get()
+    .then((snapshot) => {
+
+        snapshot.forEach((doc) => {
+
+            const data = doc.data();
+
+            if (
+                data.date &&
+                data.date.startsWith(selectedMonth)
+            ) {
+
+                daysRecorded++;
+
+                monthlyRevenue +=
+                    Number(data.totalRevenue || 0);
+
+                // TOP WAITER
+                if (data.topWaiter) {
+
+                    if (!waiterTotals[data.topWaiter]) {
+
+                        waiterTotals[data.topWaiter] = 0;
+                    }
+
+                    waiterTotals[data.topWaiter] +=
+                        Number(data.topWaiterSales || 0);
+                }
+
+                // MOST SOLD FOOD
+                if (data.mostSoldFood) {
+
+                    if (!foodTotals[data.mostSoldFood]) {
+
+                        foodTotals[data.mostSoldFood] = 0;
+                    }
+
+                    foodTotals[data.mostSoldFood] +=
+                        Number(data.mostSoldFoodQty || 0);
+                }
+
+                // MOST SOLD DRINK
+                if (data.mostSoldDrink) {
+
+                    if (!drinkTotals[data.mostSoldDrink]) {
+
+                        drinkTotals[data.mostSoldDrink] = 0;
+                    }
+
+                    drinkTotals[data.mostSoldDrink] +=
+                        Number(data.mostSoldDrinkQty || 0);
+                }
+
+            }
+
+        });
+
+        // EMPLOYEE OF THE MONTH
+        let employeeOfMonth = "None";
+
+        let employeeSales = 0;
+
+        for (let waiter in waiterTotals) {
+
+            if (waiterTotals[waiter] > employeeSales) {
+
+                employeeSales = waiterTotals[waiter];
+
+                employeeOfMonth = waiter;
+            }
+        }
+
+        // MOST SOLD FOOD
+        let topFood = "None";
+
+        let topFoodQty = 0;
+
+        for (let food in foodTotals) {
+
+            if (foodTotals[food] > topFoodQty) {
+
+                topFoodQty = foodTotals[food];
+
+                topFood = food;
+            }
+        }
+
+        // MOST SOLD DRINK
+        let topDrink = "None";
+
+        let topDrinkQty = 0;
+
+        for (let drink in drinkTotals) {
+
+            if (drinkTotals[drink] > topDrinkQty) {
+
+                topDrinkQty = drinkTotals[drink];
+
+                topDrink = drink;
+            }
+        }
+
+        document.getElementById(
+            "monthlyReportResults"
+        ).innerHTML = `
+
+            <div style="
+                background:#f8f9fa;
+                padding:20px;
+                border-radius:10px;
+            ">
+
+                <h2>
+                    📅 ${selectedMonth} REPORT
+                </h2>
+
+                <p>
+                    💰 <b>Monthly Revenue:</b><br>
+                    GHS ${monthlyRevenue.toFixed(2)}
+                </p>
+
+                <p>
+                    🏆 <b>Employee of the Month:</b><br>
+                    ${employeeOfMonth}<br>
+                    GHS ${employeeSales.toFixed(2)}
+                </p>
+
+                <p>
+                    🍕 <b>Most Sold Food:</b><br>
+                    ${topFood}
+                    (${topFoodQty} sold)
+                </p>
+
+                <p>
+                    🥤 <b>Most Sold Drink:</b><br>
+                    ${topDrink}
+                    (${topDrinkQty} sold)
+                </p>
+
+                <p>
+                    📅 <b>Days Recorded:</b><br>
+                    ${daysRecorded}
+                </p>
+
+            </div>
+        `;
+
+    });
+
+}
+
 </script>
 
 </body>
