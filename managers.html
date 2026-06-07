@@ -315,9 +315,32 @@ Do you want to close the day?`
     })
     .then(() => {
 
-        alert("Daily report saved successfully!");
+    db.collection("completedOrders")
+    .get()
+    .then((snapshot) => {
 
-    })
+        const batch = db.batch();
+
+        snapshot.forEach((doc) => {
+
+            batch.delete(doc.ref);
+
+        });
+
+        batch.commit()
+        .then(() => {
+
+            alert(
+                "Daily report saved.\n\n" +
+                "Paid tables cleared.\n\n" +
+                "New day started successfully!"
+            );
+
+        });
+
+    });
+
+})
     .catch((error) => {
 
         alert("Error saving report: " + error.message);
