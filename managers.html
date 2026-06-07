@@ -795,45 +795,53 @@ document.getElementById("topWaiter").innerHTML = `
 
 function loginManager() {
 
-    const username =
-        document.getElementById("managerUsername").value;
+    console.log("LOGIN CLICKED"); // DEBUG
 
-    const password =
-        document.getElementById("managerPassword").value;
+    const username = document.getElementById("managerUsername").value.trim();
+    const password = document.getElementById("managerPassword").value.trim();
 
-    if (
-    username === "kingpin" &&
-    password === "king3."
-) {
+    if (!username || !password) {
+        alert("Please enter username and password");
+        return;
+    }
 
-    // 1. HIDE LOGIN
-    document.getElementById("managerLogin").style.display = "none";
+    if (username === "kingpin" && password === "king3.") {
 
-    // 2. SHOW DASHBOARD SECTIONS
-    document.getElementById("revenueSummary").style.display = "block";
-    document.getElementById("paymentAnalysis").style.display = "block";
-    document.getElementById("salesInsights").style.display = "block";
-    document.getElementById("topWaiter").style.display = "block";
-    document.getElementById("clearDashboardBtn").style.display = "inline-block";
-    document.getElementById("clearPaidTablesBtn").style.display = "inline-block";
-    document.getElementById("dashboardHeader").style.display = "block";
-    document.getElementById("dashboard").style.display = "block";
-    document.getElementById("paidTablesHeader").style.display = "block";
-    document.getElementById("completedDashboard").style.display = "block";
-    document.getElementById("monthlyReports").style.display = "block";
+        // 1. HIDE LOGIN
+        document.getElementById("managerLogin").style.display = "none";
 
-    // 3. SHOW LOADING STATE
-    document.getElementById("dashboard").innerHTML = "Loading...";
-    document.getElementById("completedDashboard").innerHTML = "Loading...";
+        // 2. SHOW DASHBOARD SECTIONS
+        document.getElementById("revenueSummary").style.display = "block";
+        document.getElementById("paymentAnalysis").style.display = "block";
+        document.getElementById("salesInsights").style.display = "block";
+        document.getElementById("topWaiter").style.display = "block";
+        document.getElementById("clearDashboardBtn").style.display = "inline-block";
+        document.getElementById("clearPaidTablesBtn").style.display = "inline-block";
+        document.getElementById("dashboardHeader").style.display = "block";
+        document.getElementById("dashboard").style.display = "block";
+        document.getElementById("paidTablesHeader").style.display = "block";
+        document.getElementById("completedDashboard").style.display = "block";
+        document.getElementById("monthlyReports").style.display = "block";
 
-    // 4. LOAD MONTHS
-    populateMonths();
+        // 3. SHOW LOADING STATE (BEFORE DATA LOAD)
+        document.getElementById("dashboard").innerHTML = "Loading...";
+        document.getElementById("completedDashboard").innerHTML = "Loading...";
 
-    // 5. START FIREBASE LISTENERS (IMPORTANT LAST)
-    startDashboard();
+        // 4. INIT MONTHS
+        populateMonths();
 
-} else {
-    alert("Invalid Username or Password");
+        // 5. START FIREBASE LISTENERS
+        if (typeof startDashboard === "function") {
+            startDashboard();
+        } else {
+            console.error("startDashboard() is missing");
+        }
+
+        console.log("LOGIN SUCCESS");
+
+    } else {
+        alert("Invalid Username or Password");
+    }
 }
 
 function populateMonths() {
