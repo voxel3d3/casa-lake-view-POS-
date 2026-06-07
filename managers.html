@@ -1,3 +1,5 @@
+Managers.html
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -454,6 +456,8 @@ alert("Most Sold Drink: " + mostSoldDrink);
 db.collection("liveOrders")
 .onSnapshot((snapshot) => {
 
+    console.log("LIVE ORDERS RECEIVED");
+
     const dashboard = document.getElementById("dashboard");
 
     let html = "";
@@ -488,6 +492,8 @@ db.collection("liveOrders")
 
 db.collection("completedOrders")
 .onSnapshot((snapshot) => {
+
+    console.log("COMPLETED ORDERS RECEIVED");
 
     const completed = document.getElementById("completedDashboard");
 
