@@ -376,11 +376,14 @@ if(data.paymentMethod === "Momo"){
 
 });
 
+let totalRevenue = 0;
+let paidTables = 0;
+
 db.collection("completedOrders")
 .onSnapshot((snapshot) => {
 
-    let totalRevenue = 0;
-    let paidTables = 0;
+totalRevenue = 0;
+paidTables = 0;
 
 let foodSales = {};
 let drinkSales = {};
