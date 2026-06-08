@@ -1194,6 +1194,9 @@ function addFood() {
     const price =
         Number(document.getElementById("foodPrice").value);
 
+    const section =
+        document.getElementById("foodSection").value;
+
     if (!name || price <= 0) {
 
         alert("Please enter valid food details.");
@@ -1210,6 +1213,10 @@ function addFood() {
 
         category: "food",
 
+        section: section,
+
+        archived: false,
+
         createdAt: new Date().toISOString()
 
     })
@@ -1221,6 +1228,8 @@ function addFood() {
         document.getElementById("foodName").value = "";
 
         document.getElementById("foodPrice").value = "";
+
+        document.getElementById("foodSection").selectedIndex = 0;
 
     })
 
