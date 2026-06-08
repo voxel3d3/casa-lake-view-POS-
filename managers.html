@@ -181,6 +181,64 @@ box-shadow:0 2px 5px rgba(0,0,0,.1);
     ➕ Add Food
 </button>
 
+<hr style="margin:20px 0;">
+
+<h2>🥤 Drink Management</h2>
+
+<input
+    type="text"
+    id="drinkName"
+    placeholder="Drink Name"
+    style="
+        width:100%;
+        padding:10px;
+        margin-bottom:10px;
+        box-sizing:border-box;
+    "
+>
+
+<input
+    type="number"
+    id="drinkPrice"
+    placeholder="Price"
+    style="
+        width:100%;
+        padding:10px;
+        margin-bottom:10px;
+        box-sizing:border-box;
+    "
+>
+
+<select
+    id="drinkSection"
+    style="
+        width:100%;
+        padding:10px;
+        margin-bottom:10px;
+        box-sizing:border-box;
+    "
+>
+    <option value="soft-drinks">Soft Drinks</option>
+    <option value="energy-beer">Energy & Beer</option>
+    <option value="wine-champagne">Champagne & Wine</option>
+    <option value="spirits-liqueur">Spirits/Liqueur</option>
+    <option value="shorts">Shorts</option>
+</select>
+
+<button
+    onclick="addDrink()"
+    style="
+        padding:10px 20px;
+        background:#3498db;
+        color:white;
+        border:none;
+        border-radius:5px;
+        cursor:pointer;
+    "
+>
+    ➕ Add Drink
+</button>
+
 <h3>🔍 Search Menu</h3>
 
 <input
