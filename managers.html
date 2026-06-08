@@ -1301,6 +1301,48 @@ function searchMenu() {
 
 }
 
+function updateMenuPrice(docId) {
+
+    const newPrice = Number(
+        document.getElementById(
+            `price-${docId}`
+        ).value
+    );
+
+    if (newPrice <= 0) {
+
+        alert(
+            "Please enter a valid price."
+        );
+
+        return;
+    }
+
+    db.collection("menu")
+    .doc(docId)
+    .update({
+
+        price: newPrice
+
+    })
+    .then(() => {
+
+        alert(
+            "Price updated successfully."
+        );
+
+    })
+    .catch((error) => {
+
+        alert(
+            "Error updating price: " +
+            error.message
+        );
+
+    });
+
+}
+
 function loginManager() {
 
     console.log("LOGIN CLICKED"); // DEBUG
