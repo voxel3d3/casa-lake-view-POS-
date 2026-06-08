@@ -1245,19 +1245,45 @@ function searchMenu() {
             ) {
 
                 html += `
-                    <div style="
-                        background:#f8f9fa;
-                        padding:10px;
-                        margin-bottom:10px;
-                        border-radius:5px;
-                    ">
+    <div style="
+        background:#f8f9fa;
+        padding:10px;
+        margin-bottom:10px;
+        border-radius:5px;
+    ">
 
-                        <b>${item.name}</b><br>
+        <b>${item.name}</b><br>
 
-                        GHS ${item.price}
+        Price:
+        <input
+            type="number"
+            id="price-${doc.id}"
+            value="${item.price}"
+            style="
+                width:100px;
+                padding:5px;
+                margin:10px 0;
+            "
+        >
 
-                    </div>
-                `;
+        <br>
+
+        <button
+            onclick="updateMenuPrice('${doc.id}')"
+            style="
+                background:#27ae60;
+                color:white;
+                border:none;
+                padding:8px 15px;
+                border-radius:5px;
+                cursor:pointer;
+            "
+        >
+            Save
+        </button>
+
+    </div>
+`;
             }
 
         });
