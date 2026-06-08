@@ -132,31 +132,54 @@ box-shadow:0 2px 5px rgba(0,0,0,.1);
         "
     >
 
-    <input
-        type="number"
-        id="foodPrice"
-        placeholder="Price"
-        style="
-            width:100%;
-            padding:10px;
-            margin-bottom:10px;
-            box-sizing:border-box;
-        "
-    >
+   <input
+    type="number"
+    id="foodPrice"
+    placeholder="Price"
+    style="
+        width:100%;
+        padding:10px;
+        margin-bottom:10px;
+        box-sizing:border-box;
+    "
+>
 
-    <button
-        onclick="addFood()"
-        style="
-            padding:10px 20px;
-            background:#27ae60;
-            color:white;
-            border:none;
-            border-radius:5px;
-            cursor:pointer;
-        "
-    >
-        ➕ Add Food
-    </button>
+<select
+    id="foodSection"
+    style="
+        width:100%;
+        padding:10px;
+        margin-bottom:10px;
+        box-sizing:border-box;
+    "
+>
+    <option value="breakfast">Breakfast</option>
+    <option value="starters">Starters</option>
+    <option value="main-dish">Main Dish</option>
+    <option value="local-dish">Local Dish</option>
+    <option value="side-dish">Side Dishes</option>
+    <option value="sandwiches">Sandwiches/Wraps</option>
+    <option value="pizza">Pizza</option>
+    <option value="special-foods">Special Foods</option>
+    <option value="combos">Combos Menu</option>
+    <option value="kids-meal">Kids Meal</option>
+    <option value="extras">Extras</option>
+    <option value="alhaji-package">Alhaji Package</option>
+</select>
+
+<button
+    onclick="addFood()"
+    style="
+        padding:10px 20px;
+        background:#27ae60;
+        color:white;
+        border:none;
+        border-radius:5px;
+        cursor:pointer;
+    "
+>
+    ➕ Add Food
+</button>
 
 <h3>🔍 Search Menu</h3>
 
