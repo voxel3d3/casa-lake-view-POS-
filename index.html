@@ -3064,54 +3064,56 @@ firebase.initializeApp(firebaseConfig);
 
 const db = firebase.firestore();
 
+
 db.collection("menu").onSnapshot((snapshot) => {
 
     snapshot.docChanges().forEach((change) => {
 
-        if (change.type === "added") {
+        if (change.type !== "added") return;
 
-            const item = change.doc.data();
+        const item = change.doc.data();
 
-            // Ignore archived items
-            if (item.archived === true) return;
+        // Ignore archived items
+        if (item.archived === true) return;
 
-            // Only process foods
-            if (item.category !== "food") return;
+        // Only process food and drinks
+        if (
+            item.category !== "food" &&
+            item.category !== "drink"
+        ) return;
 
-            // Find the matching section container
-            const sectionDiv =
-                document.getElementById(item.section);
+        // Find the matching section container
+        const sectionDiv =
+            document.getElementById(item.section);
 
-            // Skip if the section doesn't exist in the POS
-            if (!sectionDiv) return;
+        // Skip if the section doesn't exist in the POS
+        if (!sectionDiv) return;
 
-            // Prevent duplicates
-            const existing =
-                sectionDiv.querySelector(
-                    `[data-firebase-id="${change.doc.id}"]`
-                );
+        // Prevent duplicates
+        const existing =
+            sectionDiv.querySelector(
+                `[data-firebase-id="${change.doc.id}"]`
+            );
 
-            if (existing) return;
+        if (existing) return;
 
-            // Add the menu item
-            sectionDiv.innerHTML += `
-                <div class="item-card"
-                     data-category="food"
-                     data-firebase-id="${change.doc.id}"
-                     onclick="addToOrder('${item.name}', ${item.price})">
+        // Add the menu item
+        sectionDiv.innerHTML += `
+            <div class="item-card"
+                 data-category="${item.category}"
+                 data-firebase-id="${change.doc.id}"
+                 onclick="addToOrder('${item.name}', ${item.price})">
 
-                    <span class="item-name">
-                        ${item.name}
-                    </span>
+                <span class="item-name">
+                    ${item.name}
+                </span>
 
-                    <span class="item-price">
-                        GHS ${item.price}
-                    </span>
+                <span class="item-price">
+                    GHS ${item.price}
+                </span>
 
-                </div>
-            `;
-        }
-
+            </div>
+        `;
     });
 
 });
