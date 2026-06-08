@@ -1282,6 +1282,21 @@ function searchMenu() {
             Save
         </button>
 
+<button
+    onclick="deleteMenuItem('${doc.id}')"
+    style="
+        background:#e74c3c;
+        color:white;
+        border:none;
+        padding:8px 15px;
+        border-radius:5px;
+        cursor:pointer;
+        margin-left:10px;
+    "
+>
+    Delete
+</button>
+
     </div>
 `;
             }
@@ -1338,6 +1353,37 @@ alert("updateMenuPrice is running");
 
         alert(
             "Error updating price: " +
+            error.message
+        );
+
+    });
+
+}
+
+function deleteMenuItem(docId) {
+
+    const proceed = confirm(
+        "Are you sure you want to delete this menu item?"
+    );
+
+    if (!proceed) {
+        return;
+    }
+
+    db.collection("menu")
+    .doc(docId)
+    .delete()
+    .then(() => {
+
+        alert("Menu item deleted successfully.");
+
+        searchMenu();
+
+    })
+    .catch((error) => {
+
+        alert(
+            "Error deleting item: " +
             error.message
         );
 
