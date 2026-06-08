@@ -164,6 +164,7 @@ box-shadow:0 2px 5px rgba(0,0,0,.1);
     type="text"
     id="menuSearch"
     placeholder="Search food or drink..."
+    onkeyup="searchMenu()"
     style="
         width:100%;
         padding:10px;
@@ -1203,6 +1204,72 @@ function addFood() {
     .catch((error) => {
 
         alert(error.message);
+
+    });
+
+}
+
+function searchMenu() {
+
+    const searchText =
+        document.getElementById("menuSearch")
+        .value
+        .toLowerCase()
+        .trim();
+
+    const results =
+        document.getElementById("searchResults");
+
+    if (searchText === "") {
+
+        results.innerHTML =
+            "Start typing to search menu items...";
+
+        return;
+    }
+
+    db.collection("menu")
+    .get()
+    .then((snapshot) => {
+
+        let html = "";
+
+        snapshot.forEach((doc) => {
+
+            const item = doc.data();
+
+            if (
+                item.name
+                .toLowerCase()
+                .includes(searchText)
+            ) {
+
+                html += `
+                    <div style="
+                        background:#f8f9fa;
+                        padding:10px;
+                        margin-bottom:10px;
+                        border-radius:5px;
+                    ">
+
+                        <b>${item.name}</b><br>
+
+                        GHS ${item.price}
+
+                    </div>
+                `;
+            }
+
+        });
+
+        if (html === "") {
+
+            html =
+                "No matching menu items found.";
+
+        }
+
+        results.innerHTML = html;
 
     });
 
