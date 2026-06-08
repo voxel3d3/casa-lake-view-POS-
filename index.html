@@ -1,3 +1,5 @@
+Editing_ POS
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -3061,6 +3063,42 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 const db = firebase.firestore();
+
+db.collection("menu").onSnapshot((snapshot) => {
+
+    snapshot.forEach((doc) => {
+
+        const item = doc.data();
+
+        if (item.section === "breakfast") {
+
+            const breakfastDiv =
+                document.getElementById("breakfast");
+
+            if (breakfastDiv) {
+
+                breakfastDiv.innerHTML += `
+                    <div class="item-card"
+                        data-category="food"
+                        onclick="addToOrder('${item.name}', ${item.price})">
+
+                        <span class="item-name">
+                            ${item.name}
+                        </span>
+
+                        <span class="item-price">
+                            GHS ${item.price}
+                        </span>
+
+                    </div>
+                `;
+            }
+        }
+
+    });
+
+});
+
 </script>
 
 </body>
