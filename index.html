@@ -3066,33 +3066,50 @@ const db = firebase.firestore();
 
 db.collection("menu").onSnapshot((snapshot) => {
 
-    snapshot.forEach((doc) => {
+    snapshot.docChanges().forEach((change) => {
 
-        const item = doc.data();
+        if (change.type === "added") {
 
-        if (item.section === "breakfast") {
+            const item = change.doc.data();
 
-            const breakfastDiv =
-                document.getElementById("breakfast");
+            // Ignore archived items
+            if (item.archived === true) return;
 
-            if (breakfastDiv) {
+            // Only process foods
+            if (item.category !== "food") return;
 
-                breakfastDiv.innerHTML += `
-                    <div class="item-card"
-                        data-category="food"
-                        onclick="addToOrder('${item.name}', ${item.price})">
+            // Find the matching section container
+            const sectionDiv =
+                document.getElementById(item.section);
 
-                        <span class="item-name">
-                            ${item.name}
-                        </span>
+            // Skip if the section doesn't exist in the POS
+            if (!sectionDiv) return;
 
-                        <span class="item-price">
-                            GHS ${item.price}
-                        </span>
+            // Prevent duplicates
+            const existing =
+                sectionDiv.querySelector(
+                    `[data-firebase-id="${change.doc.id}"]`
+                );
 
-                    </div>
-                `;
-            }
+            if (existing) return;
+
+            // Add the menu item
+            sectionDiv.innerHTML += `
+                <div class="item-card"
+                     data-category="food"
+                     data-firebase-id="${change.doc.id}"
+                     onclick="addToOrder('${item.name}', ${item.price})">
+
+                    <span class="item-name">
+                        ${item.name}
+                    </span>
+
+                    <span class="item-price">
+                        GHS ${item.price}
+                    </span>
+
+                </div>
+            `;
         }
 
     });
