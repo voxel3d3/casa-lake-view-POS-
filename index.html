@@ -2565,22 +2565,24 @@ db.collection("menu").onSnapshot((snapshot) => {
         if (existing) return;
 
         // Add the menu item
-        sectionDiv.innerHTML += `
-            <div class="item-card"
-                 data-category="${item.category}"
-                 data-firebase-id="${change.doc.id}"
-                 onclick="addToOrder('${item.name}', ${item.price})">
+sectionDiv.innerHTML += `
+    <div class="item-card"
+         data-category="${item.category}"
+         data-firebase-id="${change.doc.id}"
+         onclick="addToOrder('${item.name}', ${item.price})">
 
-                <span class="item-name">
-                    ${item.name}
-                </span>
+        <span class="item-name">
+            ${item.name}
+        </span>
 
-                <span class="item-price">
-                    GHS ${item.price}
-                </span>
+        <span class="item-price">
+            GHS ${item.price}
+        </span>
 
-            </div>
-        `;
+    </div>
+`;
+
+rebuildSearchIndex();
     });
 
 });
