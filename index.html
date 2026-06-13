@@ -1,5 +1,3 @@
-Editing_ POS
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -479,7 +477,7 @@ Editing_ POS
 <button class="sub-tab-btn" onclick="switchFoodSubTab('extras')">EXTRAS</button>
 </div>
         <div id="drink-sub-tabs" class="sub-tab-bar" style="display: none;">
-            <button class="sub-tab-btn" onclick="switchDrinkSubTab('soft-drinks')">Soft Drinks</button>
+            <button class="sub-tab-btn active" onclick="switchDrinkSubTab('soft-drinks')">Soft Drinks</button>
             <button class="sub-tab-btn" onclick="switchDrinkSubTab('energy-beer')">Energy & Beer</button>
             <button class="sub-tab-btn" onclick="switchDrinkSubTab('wine-champagne')">Champagne & Wine</button>
             <button class="sub-tab-btn" onclick="switchDrinkSubTab('spirits-liqueur')">Spirits/Liqueur</button>
@@ -2565,25 +2563,28 @@ db.collection("menu").onSnapshot((snapshot) => {
         if (existing) return;
 
         // Add the menu item
-sectionDiv.innerHTML += `
-    <div class="item-card"
-         data-category="${item.category}"
-         data-firebase-id="${change.doc.id}"
-         onclick="addToOrder('${item.name}', ${item.price})">
+        sectionDiv.innerHTML += `
+            <div class="item-card"
+                 data-category="${item.category}"
+                 data-firebase-id="${change.doc.id}"
+                 onclick="addToOrder('${item.name}', ${item.price})">
 
-        <span class="item-name">
-            ${item.name}
-        </span>
+                <span class="item-name">
+                    ${item.name}
+                </span>
 
-        <span class="item-price">
-            GHS ${item.price}
-        </span>
+                <span class="item-price">
+                    GHS ${item.price}
+                </span>
 
-    </div>
-`;
+            </div>
+        `;
 
-rebuildSearchIndex();
+        rebuildSearchIndex();
+
     });
+
+    switchMainTab(currentMainMode);
 
 });
 
