@@ -142,11 +142,10 @@ align-items: flex-start;
     padding: 15px;
     display: none;
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    grid-auto-rows: minmax(100px, auto);
     gap: 10px;
 
-align-content: start;
-
+    align-content: start;
+    justify-content: start;
 }
 
         .grid-container.active {
@@ -169,7 +168,7 @@ align-content: start;
             box-shadow: 0 2px 4px rgba(0,0,0,0.02);
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
             text-align: center;
             padding: 10px;
