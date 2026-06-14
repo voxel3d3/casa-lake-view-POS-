@@ -2683,6 +2683,26 @@ firebase.initializeApp(firebaseConfig);
 
 const db = firebase.firestore();
 
+db.collection("tableLocks")
+    .onSnapshot(snapshot => {
+
+        snapshot.forEach(doc => {
+
+            const data = doc.data();
+
+            const tableId = doc.id;
+
+            if (!tableLocks) return;
+
+            tableLocks[tableId] = data.locked;
+
+        });
+
+        updateReceiptDisplay();
+        updateTableIndicators();
+
+    });
+
 db.collection("menu").onSnapshot((snapshot) => {
 
     // 1. CLEAR ALL SECTIONS FIRST
