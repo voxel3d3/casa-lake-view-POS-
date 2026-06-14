@@ -2572,7 +2572,7 @@ db.collection("menu").onSnapshot((snapshot) => {
         ) return;
 
         // Find the matching section container
-       const sectionDiv = document.querySelector(`#${item.section}.active`);
+       const sectionDiv = document.getElementById(item.section);
 
         // Skip if the section doesn't exist in the POS
         if (!sectionDiv) return;
@@ -2606,13 +2606,6 @@ db.collection("menu").onSnapshot((snapshot) => {
         rebuildSearchIndex();
 
     });
-
-    setTimeout(() => {
-    document.getElementById(currentMainMode === 'foods'
-        ? currentFoodSubTab
-        : currentDrinkSubTab
-    )?.classList.add('active');
-}, 50);
 
 });
 
