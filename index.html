@@ -1688,23 +1688,34 @@ localStorage.setItem(
         }
 
         function switchMainTab(mode) {
-            currentMainMode = mode;
-            document.querySelectorAll('.grid-container').forEach(el => el.classList.remove('active'));
-            document.getElementById('main-food-btn').classList.remove('active');
-            document.getElementById('main-drinks-btn').classList.remove('active');
+    currentMainMode = mode;
 
-            if(mode === 'foods') {
-                document.getElementById('main-food-btn').classList.add('active');
-                document.getElementById('drink-sub-tabs').style.display = 'none';
-                document.getElementById('food-sub-tabs').style.display = 'flex';
-                document.getElementById(currentFoodSubTab).classList.add('active');
-            } else {
-                document.getElementById('main-drinks-btn').classList.add('active');
-                document.getElementById('food-sub-tabs').style.display = 'none';
-                document.getElementById('drink-sub-tabs').style.display = 'flex';
-                document.getElementById(currentDrinkSubTab).classList.add('active');
-            }
-        }
+    document.getElementById('main-food-btn').classList.remove('active');
+    document.getElementById('main-drinks-btn').classList.remove('active');
+
+    // ONLY hide food/drink groups (NOT all grids)
+    document.querySelectorAll('.food-grid').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.drink-grid').forEach(el => el.classList.remove('active'));
+
+    if (mode === 'foods') {
+
+        document.getElementById('main-food-btn').classList.add('active');
+
+        document.getElementById('food-sub-tabs').style.display = 'flex';
+        document.getElementById('drink-sub-tabs').style.display = 'none';
+
+        document.getElementById(currentFoodSubTab).classList.add('active');
+
+    } else {
+
+        document.getElementById('main-drinks-btn').classList.add('active');
+
+        document.getElementById('food-sub-tabs').style.display = 'none';
+        document.getElementById('drink-sub-tabs').style.display = 'flex';
+
+        document.getElementById(currentDrinkSubTab).classList.add('active');
+    }
+}
 
         function switchFoodSubTab(subTabId) {
             currentFoodSubTab = subTabId;
@@ -2593,7 +2604,12 @@ db.collection("menu").onSnapshot((snapshot) => {
 
     });
 
-    switchMainTab(currentMainMode);
+    setTimeout(() => {
+    document.getElementById(currentMainMode === 'foods'
+        ? currentFoodSubTab
+        : currentDrinkSubTab
+    )?.classList.add('active');
+}, 50);
 
 });
 
