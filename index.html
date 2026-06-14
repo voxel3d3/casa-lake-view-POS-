@@ -2553,60 +2553,42 @@ firebase.initializeApp(firebaseConfig);
 
 const db = firebase.firestore();
 
-
 db.collection("menu").onSnapshot((snapshot) => {
 
-    snapshot.docChanges().forEach((change) => {
+    // 1. CLEAR ALL SECTIONS FIRST
+    document.querySelectorAll('.grid-container').forEach(el => {
+        el.innerHTML = "";
+    });
 
-        if (change.type !== "added") return;
+    // 2. LOOP THROUGH ALL DATA
+    snapshot.forEach((doc) => {
 
-        const item = change.doc.data();
+        const item = doc.data();
 
         // Ignore archived items
         if (item.archived === true) return;
 
-        // Only process food and drinks
-        if (
-            item.category !== "food" &&
-            item.category !== "drink"
-        ) return;
+        // Only food + drinks
+        if (item.category !== "food" && item.category !== "drink") return;
 
-        // Find the matching section container
-       const sectionDiv = document.getElementById(item.section);
-
-        // Skip if the section doesn't exist in the POS
+        const sectionDiv = document.getElementById(item.section);
         if (!sectionDiv) return;
 
-        // Prevent duplicates
-        const existing =
-            sectionDiv.querySelector(
-                `[data-firebase-id="${change.doc.id}"]`
-            );
-
-        if (existing) return;
-
-        // Add the menu item
-        sectionDiv.innerHTML += `
+        sectionDiv.insertAdjacentHTML("beforeend", `
             <div class="item-card"
                  data-category="${item.category}"
-                 data-firebase-id="${change.doc.id}"
+                 data-firebase-id="${doc.id}"
                  onclick="addToOrder('${item.name}', ${item.price})">
 
-                <span class="item-name">
-                    ${item.name}
-                </span>
+                <span class="item-name">${item.name}</span>
 
-                <span class="item-price">
-                    GHS ${item.price}
-                </span>
+                <span class="item-price">GHS ${item.price}</span>
 
             </div>
-        `;
-
-        rebuildSearchIndex();
-
+        `);
     });
 
+    rebuildSearchIndex();
 });
 
 </script>
