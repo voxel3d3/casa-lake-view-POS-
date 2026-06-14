@@ -755,13 +755,6 @@ const defaultStockItems = {
     "Azul": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0}
 };
 
-tableLocks["T1"] = true;
-
-localStorage.setItem(
-    "tableLocks",
-    JSON.stringify(tableLocks)
-);
-
 // Add any missing items automatically
 
 for (let item in defaultStockItems) {
@@ -1672,6 +1665,30 @@ localStorage.setItem(
     }
 }
 
+function lockTable(tableId) {
+
+    tableLocks[tableId] = true;
+
+    localStorage.setItem(
+        "tableLocks",
+        JSON.stringify(tableLocks)
+    );
+
+    updateTableIndicators();
+}
+
+function unlockTable(tableId) {
+
+    tableLocks[tableId] = false;
+
+    localStorage.setItem(
+        "tableLocks",
+        JSON.stringify(tableLocks)
+    );
+
+    updateTableIndicators();
+}
+
         function searchMenu() {
             const query = document.getElementById('menu-search').value.toLowerCase().trim();
             const resultsView = document.getElementById('search-results-view');
@@ -1767,6 +1784,13 @@ localStorage.setItem(
 
        function addToOrder(name, price) {
 
+if (tableLocks[currentTable]) {
+
+    alert("🔒 This table is locked. Manager approval is required.");
+
+    return;
+}
+
     if (!tableOrders[currentTable]) {
     tableOrders[currentTable] = [];
 }
@@ -1835,6 +1859,13 @@ updateTableIndicators();
 
 /* THIS FUNCTION MUST BE OUTSIDE addToOrder */
 function changeQty(itemName, change) {
+
+if (tableLocks[currentTable]) {
+
+    alert("🔒 This table is locked. Manager approval is required.");
+
+    return;
+}
 
     if (!tableOrders[currentTable]) {
     tableOrders[currentTable] = [];
