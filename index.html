@@ -2102,6 +2102,43 @@ function updateStock(itemName, field, value){
             'en-US',
             {minimumFractionDigits: 2}
         )}`;
+
+const existingUnlockBtn =
+    document.getElementById("requestUnlockBtn");
+
+if (existingUnlockBtn) {
+    existingUnlockBtn.remove();
+}
+
+if (tableLocks[currentTable] === true) {
+
+    const unlockBtn =
+        document.createElement("button");
+
+    unlockBtn.id = "requestUnlockBtn";
+
+    unlockBtn.innerText = "🔓 Request Unlock";
+
+    unlockBtn.style.padding = "10px";
+    unlockBtn.style.marginTop = "10px";
+    unlockBtn.style.width = "100%";
+    unlockBtn.style.background = "#f39c12";
+    unlockBtn.style.color = "white";
+    unlockBtn.style.border = "none";
+    unlockBtn.style.borderRadius = "5px";
+    unlockBtn.style.cursor = "pointer";
+
+    unlockBtn.onclick = function () {
+
+        alert(
+            "Manager approval system coming next."
+        );
+
+    };
+
+    container.appendChild(unlockBtn);
+}
+
 } function generateEndOfDayReport() {
 
     const reportContainer = document.getElementById('report-container');
