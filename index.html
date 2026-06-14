@@ -2569,7 +2569,7 @@ db.collection("menu").onSnapshot((snapshot) => {
         if (existing) return;
 
         // Add the menu item
-        sectionDiv.innerHTML += `
+        sectionDiv.insertAdjacentHTML("beforeend", `
             <div class="item-card"
                  data-category="${item.category}"
                  data-firebase-id="${change.doc.id}"
@@ -2590,10 +2590,7 @@ db.collection("menu").onSnapshot((snapshot) => {
 
     });
 
-    switchMainTab(currentMainMode);
-
-});
-
+ 
 </script>
 
 </body>
