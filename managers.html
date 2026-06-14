@@ -1,3 +1,5 @@
+Managers edit
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -910,8 +912,7 @@ function deleteUnlockLogs() {
 
 function approveUnlock(requestId, tableId) {
 
-    const requestRef =
-        db.collection("unlockRequests").doc(requestId);
+    const requestRef = db.collection("unlockRequests").doc(requestId);
 
     requestRef.get().then(doc => {
 
@@ -919,34 +920,37 @@ function approveUnlock(requestId, tableId) {
 
         const data = doc.data();
 
-        // MOVE TO LOG
+        // 1. LOG IT FIRST
         db.collection("unlockLogs").add({
-
             table: data.table,
             requestedBy: data.requestedBy,
             reason: data.reason,
             action: "approved",
             processedBy: currentLoggedInStaff || "Manager",
             time: new Date().toISOString()
-
         });
 
-        // UNLOCK TABLE IN POS
+        // 2. UNLOCK TABLE
         db.collection("tableLocks").doc(tableId).set({
             locked: false
         });
 
-        // REMOVE FROM PENDING
-        requestRef.delete();
+        // 3. DELETE FROM PENDING (VERY IMPORTANT)
+        return requestRef.delete();
 
+    }).then(() => {
+
+        console.log("Request approved and removed");
+
+    }).catch(err => {
+        alert(err.message);
     });
 
 }
 
 function rejectUnlock(requestId) {
 
-    const requestRef =
-        db.collection("unlockRequests").doc(requestId);
+    const requestRef = db.collection("unlockRequests").doc(requestId);
 
     requestRef.get().then(doc => {
 
@@ -954,21 +958,25 @@ function rejectUnlock(requestId) {
 
         const data = doc.data();
 
-        // MOVE TO LOG
+        // LOG IT
         db.collection("unlockLogs").add({
-
             table: data.table,
             requestedBy: data.requestedBy,
             reason: data.reason,
             action: "rejected",
             processedBy: currentLoggedInStaff || "Manager",
             time: new Date().toISOString()
-
         });
 
-        // REMOVE FROM PENDING
-        requestRef.delete();
+        // DELETE REQUEST (CRITICAL)
+        return requestRef.delete();
 
+    }).then(() => {
+
+        console.log("Request rejected and removed");
+
+    }).catch(err => {
+        alert(err.message);
     });
 
 }
