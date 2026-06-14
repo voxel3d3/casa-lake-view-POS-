@@ -1546,6 +1546,9 @@ db.collection("completedOrders").add({
 
 });
 
+// UNLOCK TABLE AFTER SUCCESSFUL PAYMENT
+unlockTable(currentTable);
+
 // CLEAR ONLY AFTER SAVING
 tableOrders[currentTable] = [];
 
