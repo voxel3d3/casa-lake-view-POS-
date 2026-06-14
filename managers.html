@@ -621,31 +621,52 @@ db.collection("unlockRequests")
 
         container.innerHTML += `
 
-            <div style="
-                border:1px solid #ddd;
-                padding:10px;
-                margin-bottom:10px;
+    <div style="
+        border:1px solid #ddd;
+        padding:10px;
+        margin-bottom:10px;
+        border-radius:5px;
+        background:white;
+    ">
+
+        <strong>Table: ${request.table}</strong><br><br>
+
+        Requested By: ${request.requestedBy}<br>
+
+        Reason: ${request.reason}<br><br>
+
+        <button
+            onclick="approveUnlock('${doc.id}', '${request.table}')"
+            style="
+                padding:6px 12px;
+                background:green;
+                color:white;
+                border:none;
                 border-radius:5px;
-            ">
+                cursor:pointer;
+                margin-right:5px;
+            "
+        >
+            Approve
+        </button>
 
-                <strong>
-                    Table:
-                    ${request.table}
-                </strong>
+        <button
+            onclick="rejectUnlock('${doc.id}')"
+            style="
+                padding:6px 12px;
+                background:red;
+                color:white;
+                border:none;
+                border-radius:5px;
+                cursor:pointer;
+            "
+        >
+            Reject
+        </button>
 
-                <br>
+    </div>
 
-                Requested By:
-                ${request.requestedBy}
-
-                <br>
-
-                Reason:
-                ${request.reason}
-
-            </div>
-
-        `;
+`;
     });
 
 });
