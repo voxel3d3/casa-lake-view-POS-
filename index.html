@@ -602,6 +602,18 @@ for(let i = 1; i <= totalTablesCount; i++) {
     }
 }
 
+let tableLocks =
+    JSON.parse(localStorage.getItem("tableLocks")) || {};
+
+for(let i = 1; i <= totalTablesCount; i++) {
+
+    const tableName = "T" + i;
+
+    if(tableLocks[tableName] === undefined) {
+        tableLocks[tableName] = false;
+    }
+}
+
 let tableOrderNumbers =
     JSON.parse(localStorage.getItem("tableOrderNumbers")) || {};
 
@@ -742,6 +754,13 @@ const defaultStockItems = {
     "Skyy Vodka": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0},
     "Azul": {opening:0, added:0, damaged:0, complimentary:0, sold:0, closing:0}
 };
+
+tableLocks["T1"] = true;
+
+localStorage.setItem(
+    "tableLocks",
+    JSON.stringify(tableLocks)
+);
 
 // Add any missing items automatically
 
@@ -1625,17 +1644,33 @@ localStorage.setItem(
 }
 
         function updateTableIndicators() {
-            for (let tableId in tableOrders) {
-                const btn = document.getElementById(`btn-${tableId}`);
-                if (btn) {
-                    if (tableOrders[tableId].length > 0) {
-                        btn.classList.add('has-orders');
-                    } else {
-                        btn.classList.remove('has-orders');
-                    }
-                }
+
+    for (let tableId in tableOrders) {
+
+        const btn = document.getElementById(`btn-${tableId}`);
+
+        if (btn) {
+
+            // Occupied table
+            if (tableOrders[tableId].length > 0) {
+                btn.classList.add('has-orders');
+            } else {
+                btn.classList.remove('has-orders');
+            }
+
+            // Locked table
+            if (tableLocks[tableId]) {
+
+                btn.innerHTML = `${tableId} 🔒`;
+
+            } else {
+
+                btn.innerHTML = tableId;
+
             }
         }
+    }
+}
 
         function searchMenu() {
             const query = document.getElementById('menu-search').value.toLowerCase().trim();
