@@ -2568,8 +2568,7 @@ db.collection("menu").onSnapshot((snapshot) => {
         ) return;
 
         // Find the matching section container
-        const sectionDiv =
-            document.getElementById(item.section);
+       const sectionDiv = document.querySelector(`#${item.section}.active`);
 
         // Skip if the section doesn't exist in the POS
         if (!sectionDiv) return;
