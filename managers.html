@@ -328,11 +328,44 @@ border-radius:10px;
 box-shadow:0 2px 5px rgba(0,0,0,.1);
 ">
 
+
     <h3>🔓 Unlock Requests</h3>
 
     <div id="unlockRequestsList">
         No pending requests.
     </div>
+
+<div id="unlockLogs"
+style="
+background:white;
+padding:15px;
+margin-top:20px;
+border-radius:10px;
+box-shadow:0 2px 5px rgba(0,0,0,.1);
+">
+    <h3>📜 Unlock History</h3>
+
+    <div id="unlockLogsList">
+        Loading logs...
+    </div>
+
+<button
+    onclick="deleteUnlockLogs()"
+    style="
+        padding:10px 20px;
+        background:#e74c3c;
+        color:white;
+        border:none;
+        border-radius:5px;
+        cursor:pointer;
+        margin-bottom:15px;
+    "
+>
+    🗑️ Delete All Logs
+</button>
+
+</div>
+
 </div>
 
 <button
@@ -596,6 +629,49 @@ firebase.initializeApp(firebaseConfig);
 
 const db = firebase.firestore();
 
+db.collection("unlockLogs")
+.orderBy("time", "desc")
+.onSnapshot(snapshot => {
+
+    const container =
+        document.getElementById("unlockLogsList");
+
+    container.innerHTML = "";
+
+    snapshot.forEach(doc => {
+
+        const log = doc.data();
+
+        container.innerHTML += `
+
+            <div style="
+                border:1px solid #ddd;
+                padding:10px;
+                margin-bottom:10px;
+                border-radius:5px;
+            ">
+
+                <strong>
+                    Table: ${log.table}
+                </strong><br>
+
+                Action: ${log.action.toUpperCase()}<br>
+
+                Requested By: ${log.requestedBy}<br>
+
+                Processed By: ${log.processedBy}<br>
+
+                Reason: ${log.reason}<br>
+
+                Time: ${new Date(log.time).toLocaleString()}
+
+            </div>
+
+        `;
+    });
+
+});
+
 db.collection("unlockRequests")
 .where("status", "==", "pending")
 .onSnapshot((snapshot) => {
@@ -806,27 +882,97 @@ function printDailyReport() {
     });
 }
 
+function deleteUnlockLogs() {
+
+    const confirmDelete =
+        confirm("Are you sure you want to delete all unlock logs?");
+
+    if (!confirmDelete) return;
+
+    db.collection("unlockLogs")
+        .get()
+        .then(snapshot => {
+
+            const batch = db.batch();
+
+            snapshot.forEach(doc => {
+                batch.delete(doc.ref);
+            });
+
+            return batch.commit();
+        })
+        .then(() => {
+            alert("All logs deleted successfully.");
+        })
+        .catch(error => {
+            alert(error.message);
+        });
+
+}
+
 function approveUnlock(requestId, tableId) {
 
-    db.collection("unlockRequests").doc(requestId).update({
-        status: "approved"
+    const requestRef =
+        db.collection("unlockRequests").doc(requestId);
+
+    requestRef.get().then(doc => {
+
+        if (!doc.exists) return;
+
+        const data = doc.data();
+
+        // MOVE TO LOG
+        db.collection("unlockLogs").add({
+
+            table: data.table,
+            requestedBy: data.requestedBy,
+            reason: data.reason,
+            action: "approved",
+            processedBy: currentLoggedInStaff || "Manager",
+            time: new Date().toISOString()
+
+        });
+
+        // UNLOCK TABLE IN POS
+        db.collection("tableLocks").doc(tableId).set({
+            locked: false
+        });
+
+        // REMOVE FROM PENDING
+        requestRef.delete();
+
     });
 
-    // unlock table in POS system (LIVE SYNC)
-    db.collection("tableLocks").doc(tableId).set({
-        locked: false
-    });
-
-    alert("Table unlocked successfully 🔓");
 }
 
 function rejectUnlock(requestId) {
 
-    db.collection("unlockRequests").doc(requestId).update({
-        status: "rejected"
+    const requestRef =
+        db.collection("unlockRequests").doc(requestId);
+
+    requestRef.get().then(doc => {
+
+        if (!doc.exists) return;
+
+        const data = doc.data();
+
+        // MOVE TO LOG
+        db.collection("unlockLogs").add({
+
+            table: data.table,
+            requestedBy: data.requestedBy,
+            reason: data.reason,
+            action: "rejected",
+            processedBy: currentLoggedInStaff || "Manager",
+            time: new Date().toISOString()
+
+        });
+
+        // REMOVE FROM PENDING
+        requestRef.delete();
+
     });
 
-    alert("Request rejected ❌");
 }
 
 function generateInvoiceNumber(date, allReports) {
