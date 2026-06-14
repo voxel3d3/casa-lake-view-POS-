@@ -785,6 +785,29 @@ function printDailyReport() {
     });
 }
 
+function approveUnlock(requestId, tableId) {
+
+    db.collection("unlockRequests").doc(requestId).update({
+        status: "approved"
+    });
+
+    // unlock table in POS system (LIVE SYNC)
+    db.collection("tableLocks").doc(tableId).set({
+        locked: false
+    });
+
+    alert("Table unlocked successfully 🔓");
+}
+
+function rejectUnlock(requestId) {
+
+    db.collection("unlockRequests").doc(requestId).update({
+        status: "rejected"
+    });
+
+    alert("Request rejected ❌");
+}
+
 function generateInvoiceNumber(date, allReports) {
 
     // Sort all report dates
