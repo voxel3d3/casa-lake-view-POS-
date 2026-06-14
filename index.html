@@ -488,7 +488,7 @@ align-items: flex-start;
         <div id="drink-sub-tabs" class="sub-tab-bar" style="display: none;">
             <button class="sub-tab-btn active" onclick="switchDrinkSubTab('soft-drinks')">Soft Drinks</button>
             <button class="sub-tab-btn" onclick="switchDrinkSubTab('energy-beer')">Energy & Beer</button>
-            <button class="sub-tab-btn" onclick="switchDrinkSubTab('wine-champagne')">Champagne & Wine</button>
+            <button class="sub-tab-btn" onclick="switchDrinkSubTab('champagne-wine')">Champagne & Wine</button>
             <button class="sub-tab-btn" onclick="switchDrinkSubTab('spirits-liqueur')">Spirits/Liqueur</button>
             <button class="sub-tab-btn" onclick="switchDrinkSubTab('shorts')">Shorts</button>
         </div>
@@ -1701,14 +1701,28 @@ localStorage.setItem(
         }
 
         function switchDrinkSubTab(subTabId) {
-            currentDrinkSubTab = subTabId;
-            document.querySelectorAll('.drink-grid').forEach(el => el.classList.remove('active'));
-            if (window.event && window.event.currentTarget) {
-                document.querySelectorAll('#drink-sub-tabs .sub-tab-btn').forEach(el => el.classList.remove('active'));
-                window.event.currentTarget.classList.add('active');
-            }
-            document.getElementById(subTabId).classList.add('active');
-        }
+
+    currentDrinkSubTab = subTabId;
+
+    document.querySelectorAll('.drink-grid')
+        .forEach(el => el.classList.remove('active'));
+
+    document.querySelectorAll('#drink-sub-tabs .sub-tab-btn')
+        .forEach(el => el.classList.remove('active'));
+
+    if (window.event && window.event.currentTarget) {
+        window.event.currentTarget.classList.add('active');
+    }
+
+    const target = document.getElementById(subTabId);
+
+    if (!target) {
+        console.warn("Drink tab not found:", subTabId);
+        return;
+    }
+
+    target.classList.add('active');
+}
 
        function addToOrder(name, price) {
 
