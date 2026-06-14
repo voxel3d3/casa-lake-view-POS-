@@ -2594,7 +2594,15 @@ db.collection("menu").onSnapshot((snapshot) => {
 
     });
 
-    switchMainTab(currentMainMode);
+    setTimeout(() => {
+    document.querySelectorAll('.grid-container').forEach(el => {
+        el.classList.remove('active');
+    });
+
+    document.getElementById(currentFoodSubTab)?.classList.add('active');
+    document.getElementById(currentDrinkSubTab)?.classList.add('active');
+
+}, 50);
 
 });
 
