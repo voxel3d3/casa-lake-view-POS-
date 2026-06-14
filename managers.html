@@ -926,7 +926,7 @@ function approveUnlock(requestId, tableId) {
             requestedBy: data.requestedBy,
             reason: data.reason,
             action: "approved",
-            processedBy: currentLoggedInStaff || "Manager",
+            processedBy: "Manager"
             time: new Date().toISOString()
         });
 
@@ -964,7 +964,7 @@ function rejectUnlock(requestId) {
             requestedBy: data.requestedBy,
             reason: data.reason,
             action: "rejected",
-            processedBy: currentLoggedInStaff || "Manager",
+            processedBy: "Manager"
             time: new Date().toISOString()
         });
 
