@@ -596,6 +596,60 @@ firebase.initializeApp(firebaseConfig);
 
 const db = firebase.firestore();
 
+db.collection("unlockRequests")
+.where("status", "==", "pending")
+.onSnapshot((snapshot) => {
+
+    const container =
+        document.getElementById(
+            "unlockRequestsList"
+        );
+
+    container.innerHTML = "";
+
+    if (snapshot.empty) {
+
+        container.innerHTML =
+            "No pending requests.";
+
+        return;
+    }
+
+    snapshot.forEach((doc) => {
+
+        const request = doc.data();
+
+        container.innerHTML += `
+
+            <div style="
+                border:1px solid #ddd;
+                padding:10px;
+                margin-bottom:10px;
+                border-radius:5px;
+            ">
+
+                <strong>
+                    Table:
+                    ${request.table}
+                </strong>
+
+                <br>
+
+                Requested By:
+                ${request.requestedBy}
+
+                <br>
+
+                Reason:
+                ${request.reason}
+
+            </div>
+
+        `;
+    });
+
+});
+
 let totalRevenue = 0;
 let paidTables = 0;
 
