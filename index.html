@@ -2130,11 +2130,41 @@ if (tableLocks[currentTable] === true) {
 
     unlockBtn.onclick = function () {
 
+    const reason = prompt(
+        "Why are you requesting an unlock?"
+    );
+
+    if (!reason) return;
+
+    db.collection("unlockRequests").add({
+
+        table: currentTable,
+
+        requestedBy: currentLoggedInStaff,
+
+        reason: reason,
+
+        status: "pending",
+
+        requestedAt: new Date().toISOString()
+
+    })
+
+    .then(() => {
+
         alert(
-            "Manager approval system coming next."
+            "Unlock request sent to manager."
         );
 
-    };
+    })
+
+    .catch(error => {
+
+        alert(error.message);
+
+    });
+
+};
 
     container.appendChild(unlockBtn);
 }
