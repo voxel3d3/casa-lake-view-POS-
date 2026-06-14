@@ -1,3 +1,5 @@
+Editing_ POS
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -133,16 +135,20 @@
         }
 
         .grid-container {
-            padding: 15px;
-            display: none;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            grid-auto-rows: minmax(100px, auto);
-            gap: 10px;
-        }
+    padding: 15px;
+    display: none;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    grid-auto-rows: minmax(100px, auto);
+    gap: 10px;
+
+    /* 🔥 THIS FIXES EVERYTHING */
+    align-content: start;
+}
 
         .grid-container.active {
-            display: grid;
-        }
+    display: grid;
+    align-content: start;
+}
 
         #search-results-view {
             padding: 15px;
