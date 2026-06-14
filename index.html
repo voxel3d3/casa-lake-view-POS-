@@ -1276,6 +1276,11 @@ commands.push(`Printed By: ${operatorName}\n`);
     commands.push(ESC_FEED_AND_CUT);
 
     await sendRawToUsbPrinter(commands);
+
+lockTable(currentTable);
+
+alert(`🔒 ${currentTable} has been locked after KOT printing.`);
+
 }
 
 async function printPendingBill(waiterName, method, operatorName) {
