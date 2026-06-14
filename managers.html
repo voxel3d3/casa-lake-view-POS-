@@ -926,7 +926,7 @@ function approveUnlock(requestId, tableId) {
             requestedBy: data.requestedBy,
             reason: data.reason,
             action: "approved",
-            processedBy: "Manager"
+            processedBy: "Manager",
             time: new Date().toISOString()
         });
 
@@ -964,8 +964,8 @@ function rejectUnlock(requestId) {
             requestedBy: data.requestedBy,
             reason: data.reason,
             action: "rejected",
-            processedBy: "Manager"
-            time: new Date().toISOString()
+            processedBy: "Manager",
+time: new Date().toISOString()
         });
 
         // DELETE REQUEST (CRITICAL)
