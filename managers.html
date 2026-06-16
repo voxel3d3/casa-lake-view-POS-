@@ -1,5 +1,3 @@
-Managers edit
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -186,7 +184,7 @@ box-shadow:0 2px 5px rgba(0,0,0,.1);
 
 <h2>🥤 Drink Management</h2>
 
-<input
+<inpu
     type="text"
     id="drinkName"
     placeholder="Drink Name"
@@ -238,6 +236,46 @@ box-shadow:0 2px 5px rgba(0,0,0,.1);
     "
 >
     ➕ Add Drink
+</button>
+
+<h3 style="margin-top:30px;">🏍 Quad Bike Management</h3>
+
+<input
+    type="text"
+    id="quadName"
+    placeholder="Quad Bike Package Name"
+    style="
+        width:100%;
+        padding:10px;
+        margin-bottom:10px;
+        box-sizing:border-box;
+    "
+>
+
+<input
+    type="number"
+    id="quadPrice"
+    placeholder="Price"
+    style="
+        width:100%;
+        padding:10px;
+        margin-bottom:10px;
+        box-sizing:border-box;
+    "
+>
+
+<button
+    onclick="addQuadBike()"
+    style="
+        padding:10px 20px;
+        background:#27ae60;
+        color:white;
+        border:none;
+        border-radius:5px;
+        cursor:pointer;
+    "
+>
+    ➕ Add Quad Bike Package
 </button>
 
 <h3>🔍 Search Menu</h3>
@@ -1611,6 +1649,56 @@ function addDrink() {
         document.getElementById("drinkPrice").value = "";
 
         document.getElementById("drinkSection").selectedIndex = 0;
+
+    })
+
+    .catch((error) => {
+
+        alert(error.message);
+
+    });
+
+}
+
+function addQuadBike() {
+
+    const name =
+        document.getElementById("quadName").value.trim();
+
+    const price =
+        Number(document.getElementById("quadPrice").value);
+
+    if (!name || price <= 0) {
+
+        alert("Please enter valid quad bike details.");
+
+        return;
+    }
+
+    db.collection("menu")
+    .add({
+
+        name: name,
+
+        price: price,
+
+        category: "quadbike",
+
+        section: "quadbike",
+
+        archived: false,
+
+        createdAt: new Date().toISOString()
+
+    })
+
+    .then(() => {
+
+        alert("Quad bike package added successfully.");
+
+        document.getElementById("quadName").value = "";
+
+        document.getElementById("quadPrice").value = "";
 
     })
 
