@@ -935,39 +935,57 @@ const staffAccounts = [
 
 // LOGIN FUNCTION
 
-function loginUser() {
+async function loginUser() {
 
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value.trim();
+    const username = document.getElementById("username").value.trim().toLowerCase();
+    const password = document.getElementById("password").value;
 
-    const foundUser = staffAccounts.find(user =>
-        user.username === username &&
-        user.password === password
-    );
+    const staff = firebaseStaff[username];
 
-    if (!foundUser) {
+    if (!staff) {
         alert("Wrong Username or Password");
         return;
     }
 
-    // Save logged-in staff
-    currentLoggedInStaff = foundUser.fullName;
-    sessionStorage.setItem("loggedIn", "true");
-    sessionStorage.setItem("staffName", foundUser.fullName);
+    try {
 
-    // Hide login screen
-    const loginScreen = document.getElementById("login-screen");
+        // Authenticate through Firebase
+        await firebase.auth().signInWithEmailAndPassword(
+            staff.email,
+            password
+        );
 
-    if (loginScreen) {
-    loginScreen.remove();
-} else {
-        alert("ERROR: login-screen not found in HTML");
+        // Firebase authentication succeeded
+        currentLoggedInStaff = staff.fullName;
+
+        sessionStorage.setItem("loggedIn", "true");
+        sessionStorage.setItem("staffName", staff.fullName);
+
+        // Hide login screen
+        const loginScreen = document.getElementById("login-screen");
+
+        if (loginScreen) {
+            loginScreen.remove();
+        } else {
+            console.warn("login-screen not found in HTML");
+        }
+
+        // Allow page scrolling
+        document.body.style.overflow = "auto";
+
+        console.log(
+            "Firebase login successful:",
+            firebase.auth().currentUser.uid
+        );
+
+        alert("LOGIN SUCCESS");
+
+    } catch (error) {
+
+        console.error("Firebase Login Error:", error);
+
+        alert("Wrong Username or Password");
     }
-
-    // Allow page scrolling
-    document.body.style.overflow = "auto";
-
-    alert("LOGIN SUCCESS");
 }
 
 function resetSystem() {
@@ -2680,6 +2698,23 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 const db = firebase.firestore();
+
+const firebaseStaff = {
+    manager: {
+        email: "manager@casalakeview.com",
+        fullName: "Manager"
+    },
+
+    kingsford: {
+        email: "Kingsford@casalakeview.com",
+        fullName: "Kingsford"
+    },
+
+    williams: {
+        email: "williams@casalakeview.com",
+        fullName: "Williams"
+    }
+};
 
 db.collection("tableLocks")
     .onSnapshot(snapshot => {
